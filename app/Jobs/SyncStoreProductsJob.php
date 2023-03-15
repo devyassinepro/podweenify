@@ -34,7 +34,7 @@ class SyncStoreProductsJob implements ShouldQueue
      */
     public function handle()
     {
-        sleep(1);
+         sleep(1);
         $store = $this->store;
         if($store['allproducts']<=250 ){
 
