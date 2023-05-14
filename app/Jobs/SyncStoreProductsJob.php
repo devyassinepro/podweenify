@@ -88,12 +88,12 @@ class SyncStoreProductsJob implements ShouldQueue
                     //echo $sales;
                     $timestt = strtotime($product->updated_at); 
                     $productreq = array(
-                        'title' => $productbd->title,
+                        'title' => $product->title,
                         'timesparam' => $timestt,
-                        'prix' => $productbd->prix,
+                        'prix' => $product->variants[0]->price,
                         'revenue' => $revenuenow,
                         'stores_id' => $productbd->stores_id,
-                        'imageproduct' => $productbd->imageproduct,
+                        'imageproduct' => $product->images[0]->src,
                         'favoris' => $productbd->favoris,
                         'totalsales' => $sales,
                     );
