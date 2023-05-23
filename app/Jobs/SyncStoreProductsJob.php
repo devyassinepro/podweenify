@@ -62,7 +62,7 @@ class SyncStoreProductsJob implements ShouldQueue
 
 }
     function updatesales($store , $i){
-                $opts = array('http'=>array('header' => "User-Agent:MyAgent/1.0\r\n")); 
+            $opts = array('http'=>array('header' => "User-Agent:MyAgent/1.0\r\n")); 
             $context = stream_context_create($opts);
             $html = file_get_contents($store.'products.json?page='.$i.'&limit=250',false,$context);
 
@@ -101,15 +101,15 @@ class SyncStoreProductsJob implements ShouldQueue
                         'imageproduct' => $product->images[0]->src,
                         'favoris' => $productbd->favoris,
                         'totalsales' => $sales,
-                        'todaysales' => $productbd->first()->todaysales_count,
-                        'yesterdaysales' => $productbd->first()->yesterdaysales_count,
-                        'day3sales' => $productbd->first()->day3sales_count,
-                        'day4sales' => $productbd->first()->day4sales_count,
-                        'day5sales' => $productbd->first()->day5sales_count,
-                        'day6sales' => $productbd->first()->day6sales_count,
-                        'day7sales' => $productbd->first()->day6sales_count,
-                        'weeksales' => $productbd->first()->weeklysales_count,
-                        'monthsales' => $productbd->first()->montlysales_count,
+                        'todaysales' => $productbd->todaysales_count,
+                        'yesterdaysales' => $productbd->yesterdaysales_count,
+                        'day3sales' => $productbd->day3sales_count,
+                        'day4sales' => $productbd->day4sales_count,
+                        'day5sales' => $productbd->day5sales_count,
+                        'day6sales' => $productbd->day6sales_count,
+                        'day7sales' => $productbd->day6sales_count,
+                        'weeksales' => $productbd->weeklysales_count,
+                        'monthsales' => $productbd->montlysales_count,
                     );
         
                     DB::table('products')->where('id', $productbd->id)->update($productreq);
