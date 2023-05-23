@@ -30,6 +30,15 @@ class Product extends Model
         'totalsales',
         'favoris',
         'starttracking',
+        'todaysales',
+        'yesterdaysales',
+        'day3sales',
+        'day4sales',
+        'day5sales',
+        'day6sales',
+        'day7sales',
+        'weeksales',
+        'monthsales',
 
     ];
     

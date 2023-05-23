@@ -81,6 +81,11 @@ class SyncStoreProductsJob implements ShouldQueue
     
                 $productbd = DB::table('products')->where('id', $product->id)->where('timesparam', '!=', strtotime($product->updated_at))->first();
                 if($productbd) {
+
+                    //Ajouter La partie calcule Revenue chaque jours de la semaines 
+
+                    $productbd = $productbd->withCount(['todaysales', 'yesterdaysales' , 'day3sales' , 'day4sales' , 'day5sales' , 'day6sales', 'day7sales', 'weeklysales', 'montlysales'])->get();
+        
         
                     $sales = $productbd->totalsales;
                     $revenuenow = $productbd->revenue + $productbd->prix;
@@ -96,6 +101,15 @@ class SyncStoreProductsJob implements ShouldQueue
                         'imageproduct' => $product->images[0]->src,
                         'favoris' => $productbd->favoris,
                         'totalsales' => $sales,
+                        'todaysales' => $productbd->first()->todaysales_count,
+                        'yesterdaysales' => $productbd->first()->yesterdaysales_count,
+                        'day3sales' => $productbd->first()->day3sales_count,
+                        'day4sales' => $productbd->first()->day4sales_count,
+                        'day5sales' => $productbd->first()->day5sales_count,
+                        'day6sales' => $productbd->first()->day6sales_count,
+                        'day7sales' => $productbd->first()->day6sales_count,
+                        'weeksales' => $productbd->first()->weeklysales_count,
+                        'monthsales' => $productbd->first()->montlysales_count,
                     );
         
                     DB::table('products')->where('id', $productbd->id)->update($productreq);
