@@ -38,7 +38,7 @@ class TestController extends Controller
         $products = json_decode($html)->products;
         collect($products)->map(function ($product) {
 
-            $productbd = Product::where('id', $product->id)->where('timesparam', '!=', strtotime($product->updated_at))->first();
+            $productbd = DB::table('products')->where('id', $product->id)->where('timesparam', '!=', strtotime($product->updated_at))->first();
             if($productbd) {
 
                 //Ajouter La partie calcule Revenue chaque jours de la semaines 
