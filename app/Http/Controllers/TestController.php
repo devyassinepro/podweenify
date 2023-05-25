@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
+set_time_limit(0);
+use App\Models\stores;
+use Illuminate\Support\Facades\Route;
 
 
 class TestController extends Controller
@@ -17,7 +20,7 @@ class TestController extends Controller
         //
 
 
-        $store = "https://printpocketgo.com/";
+        $store = "https://spanx.com/";
         $i = 1;
         $opts = array('http'=>array('header' => "User-Agent:MyAgent/1.0\r\n")); 
         $context = stream_context_create($opts);
