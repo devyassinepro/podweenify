@@ -21,7 +21,7 @@ class TestController extends Controller
         $i = 1;
         $opts = array('http'=>array('header' => "User-Agent:MyAgent/1.0\r\n")); 
         $context = stream_context_create($opts);
-        $html = file_get_contents($store.'products.json?page='.$i.'&limit=250',false,$context);
+        $html = file_get_contents($store.'products.json?page=1&limit=250',false,$context);
 
         
         DB::table('apistatuses')->insert([
