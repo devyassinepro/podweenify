@@ -1,56 +1,21 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Models\Product;
-use App\Models\Apistatus;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\StoresController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\DataController;
-use App\Http\Controllers\TestController;
-use App\Jobs\ProcessApiStoreJob;
-use Illuminate\Support\Facades\DB;
+namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
-use App\Models\stores;
 use Carbon\Carbon;
-
-set_time_limit(0);
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*///
-
-Route::get('/', function () {
-    return view('index');
-});
+use App\Models\Product;
+use Illuminate\Support\Facades\DB;
 
 
-Route::resource('affiche', TestController::class);
+class TestController extends Controller
+{
+    //
 
+    public function index()
+    {
+        //
 
-
-// Start Queue every 2 min 
-Route::get('/start',function (){
-    $stores = Stores::select("*")
-        ->where('status','1')
-        ->get();
-      
-     ProcessApiStoreJob::dispatch($stores); 
-      echo $stores; echo '<br />';
-});
-
-//test 1 store 
-
-Route::get('/starttest',function (){
 
         $store = "https://printpocketgo.com/";
         $i = 1;
@@ -117,5 +82,7 @@ Route::get('/starttest',function (){
                 } 
         });//shoudl be updated now //ok wait
 
-        
-});
+
+        // return view('index');
+    }
+}
