@@ -43,7 +43,7 @@ class TestController extends Controller
 
                 //Ajouter La partie calcule Revenue chaque jours de la semaines 
 
-                $productbd = $productbd->withCount(['todaysales', 'yesterdaysales' , 'day3sales' , 'day4sales' , 'day5sales' , 'day6sales', 'day7sales', 'weeklysales', 'montlysales'])->get();
+                // $productbd = $productbd->withCount(['todaysales', 'yesterdaysales' , 'day3sales' , 'day4sales' , 'day5sales' , 'day6sales', 'day7sales', 'weeklysales', 'montlysales'])->get();
 
                 $sales = $productbd->totalsales;
                 $revenuenow = $productbd->revenue + $productbd->prix;
@@ -59,15 +59,15 @@ class TestController extends Controller
                     'imageproduct' => $product->images[0]->src,
                     'favoris' => $productbd->favoris,
                     'totalsales' => $sales,
-                    'todaysales' => $productbd->todaysales_count,
-                    'yesterdaysales' => $productbd->yesterdaysales_count,
-                    'day3sales' => $productbd->day3sales_count,
-                    'day4sales' => $productbd->day4sales_count,
-                    'day5sales' => $productbd->day5sales_count,
-                    'day6sales' => $productbd->day6sales_count,
-                    'day7sales' => $productbd->day6sales_count,
-                    'weeksales' => $productbd->weeklysales_count,
-                    'monthsales' => $productbd->montlysales_count,
+                    'todaysales' => 10,
+                    'yesterdaysales' => 10,
+                    'day3sales' => 10,
+                    'day4sales' => 10,
+                    'day5sales' => 10,
+                    'day6sales' => 10,
+                    'day7sales' => 10,
+                    'weeksales' => 10,
+                    'monthsales' => 10,
                 );
     
                 DB::table('products')->where('id', $productbd->id)->update($productreq);
