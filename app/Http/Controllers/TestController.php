@@ -20,7 +20,7 @@ class TestController extends Controller
         //
 
 
-        $store = "https://spanx.com/";
+        $store = "https://printpocketgo.com/";
         $i = 1;
         $opts = array('http'=>array('header' => "User-Agent:MyAgent/1.0\r\n")); 
         $context = stream_context_create($opts);
@@ -43,7 +43,7 @@ class TestController extends Controller
 
                 //Ajouter La partie calcule Revenue chaque jours de la semaines 
 
-                $productbd = $productbd->withCount(['todaysales', 'yesterdaysales'])->get();
+                $productbd = $productbd->withCount(['todaysales']);
 
                 $sales = $productbd->totalsales;
                 $revenuenow = $productbd->revenue + $productbd->prix;
