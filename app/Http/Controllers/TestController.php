@@ -43,7 +43,7 @@ class TestController extends Controller
 
                 //Ajouter La partie calcule Revenue chaque jours de la semaines 
 
-                // $productbd = $productbd->withCount(['todaysales', 'yesterdaysales' , 'day3sales' , 'day4sales' , 'day5sales' , 'day6sales', 'day7sales', 'weeklysales', 'montlysales'])->get();
+                $productbd = $productbd->withCount(['todaysales', 'yesterdaysales' , 'day3sales' , 'day4sales' , 'day5sales' , 'day6sales', 'day7sales', 'weeklysales', 'montlysales'])->get();
 
                 $sales = $productbd->totalsales;
                 $revenuenow = $productbd->revenue + $productbd->prix;
