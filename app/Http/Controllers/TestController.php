@@ -63,8 +63,8 @@ class TestController extends Controller
                     'imageproduct' => $product->images[0]->src,
                     'favoris' => $productbd->favoris,
                     'totalsales' => $sales,
-                    'todaysales' => 10,
-                    'yesterdaysales' => 10,
+                    'todaysales' => $productCounter->todaysales_count,
+                    'yesterdaysales' => $productCounter->yesterdaysales_count,
                     'day3sales' => 10,
                     'day4sales' => 10,
                     'day5sales' => 10,
@@ -83,8 +83,8 @@ class TestController extends Controller
                     'created_at' => Carbon::now()->format('Y-m-d'),
                     'updated_at' => Carbon::now()->format('Y-m-d')
                 ]);
-                echo $productbd->first()->todaysales_count; echo '<br />';
-                echo $productbd->todaysales_count; echo '<br />';
+                echo $productCounter->todaysales_count; echo '<br />';
+                echo $productCounter->yesterdaysales_count; echo '<br />';
                 echo $product->title; echo '<br />';
                 } 
         });//shoudl be updated now //ok wait
