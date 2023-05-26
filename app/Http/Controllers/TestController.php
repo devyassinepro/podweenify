@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Product;
+use App\Models\Sales;
 use Illuminate\Support\Facades\DB;
 set_time_limit(0);
 use App\Models\stores;
@@ -18,7 +19,26 @@ class TestController extends Controller
     public function index()
     {
         //
+    //where timestap == Today
+    $productCounter = Product::whereDate('updated_at', '=', Carbon::today());
+    // ->withCount(['todaysales'])->get();
+    foreach($productCounter as $producttoday){
+        $countproducttoday=Sales::where('updated_at', '=', Carbon::today())->where('product_id','=',$producttoday->id)->withCount('product_id');
+                 $productreqtoday = array(
+                        'todaysales' => $countproducttoday->product_count,
+                    );
+                    DB::table('products')->where('id', $producttoday->id)->update($productreqtoday);
 
+                    echo $producttoday->title; echo '<br />';
+                    echo $producttoday->todaysales_count; echo '<br />';
+           
+    }
+
+
+    }
+
+    public function updatesales(){
+        
 
         $store = "https://printpocketgo.com/";
         $i = 1;
@@ -43,7 +63,6 @@ class TestController extends Controller
 
                 //Ajouter La partie calcule Revenue chaque jours de la semaines 
 
-              
 
                 $sales = $productbd->totalsales;
                 $revenuenow = $productbd->revenue + $productbd->prix;
@@ -51,8 +70,8 @@ class TestController extends Controller
                 //echo $sales;
                 $timestt = strtotime($product->updated_at); 
 
-                $productCounter = Product::where('id', $product->id)
-                ->withCount(['todaysales'])->first();
+
+            
         
                 $productreq = array(
                     'title' => $product->title,
@@ -63,15 +82,16 @@ class TestController extends Controller
                     'imageproduct' => $product->images[0]->src,
                     'favoris' => $productbd->favoris,
                     'totalsales' => $sales,
-                    'todaysales' => $productCounter->todaysales_count,
-                    'yesterdaysales' => $productCounter->yesterdaysales_count,
-                    'day3sales' => 10,
-                    'day4sales' => 10,
-                    'day5sales' => 10,
-                    'day6sales' => 10,
-                    'day7sales' => 10,
-                    'weeksales' => 10,
-                    'monthsales' => 10,
+                    // 'todaysales' => $productCounter->todaysales_count,
+                    // 'yesterdaysales' => $productCounter->yesterdaysales_count,
+                    // 'day3sales' => 10,
+                    // 'day4sales' => 10,
+                    // 'day5sales' => 10,
+                    // 'day6sales' => 10,
+                    // 'day7sales' => 10,
+                    // 'weeksales' => 10,
+                    // 'monthsales' => 10,
+                    'updated_at' => Carbon::now()->format('Y-m-d'),//pour comparer la journée
                 );
     
                 DB::table('products')->where('id', $productbd->id)->update($productreq);
@@ -83,8 +103,7 @@ class TestController extends Controller
                     'created_at' => Carbon::now()->format('Y-m-d'),
                     'updated_at' => Carbon::now()->format('Y-m-d')
                 ]);
-                echo $productCounter->todaysales_count; echo '<br />';
-                echo $productCounter->yesterdaysales_count; echo '<br />';
+
                 echo $product->title; echo '<br />';
                 } 
         });//shoudl be updated now //ok wait

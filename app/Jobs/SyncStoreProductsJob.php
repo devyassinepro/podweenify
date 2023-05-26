@@ -83,9 +83,6 @@ class SyncStoreProductsJob implements ShouldQueue
                 if($productbd) {
 
                     //Ajouter La partie calcule Revenue chaque jours de la semaines 
-
-                    $productbd = $productbd->withCount(['todaysales', 'yesterdaysales' , 'day3sales' , 'day4sales' , 'day5sales' , 'day6sales', 'day7sales', 'weeklysales', 'montlysales'])->get();
-        
         
                     $sales = $productbd->totalsales;
                     $revenuenow = $productbd->revenue + $productbd->prix;
@@ -110,6 +107,7 @@ class SyncStoreProductsJob implements ShouldQueue
                         'day7sales' => $productbd->day6sales_count,
                         'weeksales' => $productbd->weeklysales_count,
                         'monthsales' => $productbd->montlysales_count,
+                        'updated_at' => Carbon::now()->format('Y-m-d')
                     );
         
                     DB::table('products')->where('id', $productbd->id)->update($productreq);
