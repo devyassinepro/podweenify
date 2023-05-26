@@ -52,7 +52,7 @@ class TestController extends Controller
                 $timestt = strtotime($product->updated_at); 
 
                 $productCounter = Product::where('id', $product->id)
-                ->withCount(['todaysales', 'yesterdaysales'])->get();
+                ->withCount(['todaysales', 'yesterdaysales'])->first();
         
                 $productreq = array(
                     'title' => $product->title,
