@@ -43,13 +43,17 @@ class TestController extends Controller
 
                 //Ajouter La partie calcule Revenue chaque jours de la semaines 
 
-                $productbd = $productbd->withCount(['todaysales']);
+              
 
                 $sales = $productbd->totalsales;
                 $revenuenow = $productbd->revenue + $productbd->prix;
                 $sales ++ ; 
                 //echo $sales;
                 $timestt = strtotime($product->updated_at); 
+
+                $productCounter = Product::where('id', $product->id)
+                ->withCount(['todaysales', 'yesterdaysales'])->get();
+        
                 $productreq = array(
                     'title' => $product->title,
                     'timesparam' => $timestt,
