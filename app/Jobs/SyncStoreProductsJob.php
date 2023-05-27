@@ -97,17 +97,7 @@ class SyncStoreProductsJob implements ShouldQueue
                         'stores_id' => $productbd->stores_id,
                         'imageproduct' => $product->images[0]->src,
                         'favoris' => $productbd->favoris,
-                        'totalsales' => $sales,
-                        'todaysales' => $productbd->todaysales_count,
-                        'yesterdaysales' => $productbd->yesterdaysales_count,
-                        'day3sales' => $productbd->day3sales_count,
-                        'day4sales' => $productbd->day4sales_count,
-                        'day5sales' => $productbd->day5sales_count,
-                        'day6sales' => $productbd->day6sales_count,
-                        'day7sales' => $productbd->day6sales_count,
-                        'weeksales' => $productbd->weeklysales_count,
-                        'monthsales' => $productbd->montlysales_count,
-                        'updated_at' => Carbon::now()->format('Y-m-d')
+                        'totalsales' => $sales
                     );
         
                     DB::table('products')->where('id', $productbd->id)->update($productreq);
