@@ -64,7 +64,7 @@ Route::get('/countstores',function (){
 // Start Queue every 4 Hours 
 Route::get('/countProducts',function (){
     $Sales = Sales::select("*")
-        ->whereDate('updated_at', '=', Carbon::yesterday()->format('Y-m-d'))
+        ->whereDate('updated_at', '=', Carbon::today()->format('Y-m-d'))
         ->get();
      ProcessCountProductsRevenue::dispatch($Sales); 
       echo $Sales; echo '<br />';
