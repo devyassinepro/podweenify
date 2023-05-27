@@ -19,18 +19,25 @@ class TestController extends Controller
     public function index()
     {
         //
-    //where timestap == Today
-    $productCounter = Product::whereDate('updated_at', '=', Carbon::today());
-    // ->withCount(['todaysales'])->get();
-    foreach($productCounter as $producttoday){
-        $countproducttoday=Sales::where('updated_at', '=', Carbon::today())->where('product_id','=',$producttoday->id)->withCount('product_id');
-                 $productreqtoday = array(
-                        'todaysales' => $countproducttoday->product_count,
-                    );
-                    DB::table('products')->where('id', $producttoday->id)->update($productreqtoday);
+            //where timestap == Today
+                    $productCounter = Product::whereDate('updated_at', '=', Carbon::today());
+                    // ->withCount(['todaysales'])->get();
+                    foreach($productCounter as $producttoday){
+                        $countproducttoday=Sales::where('updated_at', '=', Carbon::today())->where('product_id','=',$producttoday->id)->withCount('product_id');
+                                $productreqtoday = array(
+                                        'todaysales' => $countproducttoday->product_count,
+                                    );
+                                    DB::table('products')->where('id', $producttoday->id)->update($productreqtoday);
 
-                    echo $producttoday->title; echo '<br />';
-                    echo $producttoday->todaysales_count; echo '<br />';
+                                    echo $producttoday->title; echo '<br />';
+                                    echo $producttoday->todaysales_count; echo '<br />';
+
+                    //update 
+
+                    $stores = stores::where('status','1')->where('id',546)->withSum('products', 'totalsales')
+                    ->withSum('products', 'revenue');
+
+
            
     }
 
@@ -69,9 +76,6 @@ class TestController extends Controller
                 $sales ++ ; 
                 //echo $sales;
                 $timestt = strtotime($product->updated_at); 
-
-
-            
         
                 $productreq = array(
                     'title' => $product->title,

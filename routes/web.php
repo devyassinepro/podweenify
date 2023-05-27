@@ -9,6 +9,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DataController;
 use App\Http\Controllers\TestController;
 use App\Jobs\ProcessApiStoreJob;
+use App\Jobs\ProcessCountProductsRevenue;
+use App\Jobs\ProcessCountStoresRevenue;
+use App\Models\Sales;
 use Illuminate\Support\Facades\DB;
 
 use Illuminate\Http\Request;
@@ -46,6 +49,25 @@ Route::get('/start',function (){
       
      ProcessApiStoreJob::dispatch($stores); 
       echo $stores; echo '<br />';
+});
+
+// Start Queue every 5 Hours 
+Route::get('/countstores',function (){
+    $stores = Stores::select("*")
+        ->where('status','1')
+        ->get();
+      
+     ProcessCountStoresRevenue::dispatch($stores); 
+      echo $stores; echo '<br />';
+});
+
+// Start Queue every 4 Hours 
+Route::get('/countProducts',function (){
+    $Sales = Sales::select("*")
+        ->whereDate('updated_at', '=', Carbon::yesterday()->format('Y-m-d'))
+        ->get();
+     ProcessCountProductsRevenue::dispatch($Sales); 
+      echo $Sales; echo '<br />';
 });
 
 //test 1 store 
@@ -104,6 +126,8 @@ Route::get('/starttest',function (){
     
                 DB::table('products')->where('id', $productbd->id)->update($productreq);
     
+                //Count 
+
                 DB::table('sales')->insert([
                     "product_id" => $productbd->id,
                     "stores_id" => $productbd->stores_id,
