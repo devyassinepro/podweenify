@@ -41,46 +41,47 @@ Route::resource('affiche', TestController::class);
 
 
 
-// Start Queue every 2 min 
+// Start Queue every 2 min
 Route::get('/start',function (){
     $stores = Stores::select("*")
         ->where('status','1')
         ->get();
-      
-     ProcessApiStoreJob::dispatch($stores); 
+
+     ProcessApiStoreJob::dispatch($stores);
       echo $stores; echo '<br />';
 });
 
-// Start Queue every 5 Hours 
+// Start Queue every 5 Hours
 Route::get('/countstores',function (){
     $stores = Stores::select("*")
         ->where('status','1')
         ->get();
-      
-     ProcessCountStoresRevenue::dispatch($stores); 
+
+     ProcessCountStoresRevenue::dispatch($stores);
       echo $stores; echo '<br />';
 });
 
-// Start Queue every 4 Hours 
+// Start Queue every 4 Hours
 Route::get('/countProducts',function (){
-    $Sales = Sales::select("*")
+    $Products = Product::select("*")
         ->whereDate('updated_at', '=', Carbon::today()->format('Y-m-d'))
         ->get();
-     ProcessCountProductsRevenue::dispatch($Sales); 
-      echo $Sales; echo '<br />';
+     ProcessCountProductsRevenue::dispatch($Products);
+      echo $Products; echo '<br />';
 });
 
-//test 1 store 
+
+//test 1 store
 
 Route::get('/starttest',function (){
 
         $store = "https://printpocketgo.com/";
         $i = 1;
-        $opts = array('http'=>array('header' => "User-Agent:MyAgent/1.0\r\n")); 
+        $opts = array('http'=>array('header' => "User-Agent:MyAgent/1.0\r\n"));
         $context = stream_context_create($opts);
         $html = file_get_contents($store.'products.json?page='.$i.'&limit=250',false,$context);
 
-        
+
         DB::table('apistatuses')->insert([
             "store" => $store,
             "status" => $http_response_header[0],
@@ -95,15 +96,15 @@ Route::get('/starttest',function (){
             $productbd = Product::where('id', $product->id)->where('timesparam', '!=', strtotime($product->updated_at))->first();
             if($productbd) {
 
-                //Ajouter La partie calcule Revenue chaque jours de la semaines 
+                //Ajouter La partie calcule Revenue chaque jours de la semaines
 
                 $productbd = $productbd->withCount(['todaysales', 'yesterdaysales' , 'day3sales' , 'day4sales' , 'day5sales' , 'day6sales', 'day7sales', 'weeklysales', 'montlysales'])->get();
 
                 $sales = $productbd->totalsales;
                 $revenuenow = $productbd->revenue + $productbd->prix;
-                $sales ++ ; 
+                $sales ++ ;
                 //echo $sales;
-                $timestt = strtotime($product->updated_at); 
+                $timestt = strtotime($product->updated_at);
                 $productreq = array(
                     'title' => $product->title,
                     'timesparam' => $timestt,
@@ -123,10 +124,10 @@ Route::get('/starttest',function (){
                     'weeksales' => $productbd->weeklysales_count,
                     'monthsales' => $productbd->montlysales_count,
                 );
-    
+
                 DB::table('products')->where('id', $productbd->id)->update($productreq);
-    
-                //Count 
+
+                //Count
 
                 DB::table('sales')->insert([
                     "product_id" => $productbd->id,
@@ -138,8 +139,8 @@ Route::get('/starttest',function (){
                 echo $productbd->first()->todaysales_count; echo '<br />';
                 echo $productbd->todaysales_count; echo '<br />';
                 echo $product->title; echo '<br />';
-                } 
+                }
         });//shoudl be updated now //ok wait
 
-        
+
 });

@@ -58,37 +58,37 @@ class SyncStoreProductsJob implements ShouldQueue
             }
     }
 
-    }       
+    }
 
 }
     function updatesales($store , $i){
-            $opts = array('http'=>array('header' => "User-Agent:MyAgent/1.0\r\n")); 
+            $opts = array('http'=>array('header' => "User-Agent:MyAgent/1.0\r\n"));
             $context = stream_context_create($opts);
             $html = file_get_contents($store.'products.json?page='.$i.'&limit=250',false,$context);
 
-            
+
             DB::table('apistatuses')->insert([
                 "store" => $store,
                 "status" => $http_response_header[0],
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now()
             ]);
-    
+
             // echo $responsecode;
             $products = json_decode($html)->products;
             collect($products)->map(function ($product) {
-    
-    
+
+
                 $productbd = DB::table('products')->where('id', $product->id)->where('timesparam', '!=', strtotime($product->updated_at))->first();
                 if($productbd) {
 
-                    //Ajouter La partie calcule Revenue chaque jours de la semaines 
-        
+                    //Ajouter La partie calcule Revenue chaque jours de la semaines
+
                     $sales = $productbd->totalsales;
                     $revenuenow = $productbd->revenue + $productbd->prix;
-                    $sales ++ ; 
+                    $sales ++ ;
                     //echo $sales;
-                    $timestt = strtotime($product->updated_at); 
+                    $timestt = strtotime($product->updated_at);
                     $productreq = array(
                         'title' => $product->title,
                         'timesparam' => $timestt,
@@ -97,11 +97,12 @@ class SyncStoreProductsJob implements ShouldQueue
                         'stores_id' => $productbd->stores_id,
                         'imageproduct' => $product->images[0]->src,
                         'favoris' => $productbd->favoris,
-                        'totalsales' => $sales
+                        'totalsales' => $sales,
+                        'updated_at' => Carbon::now()->format('Y-m-d'),
                     );
-        
+
                     DB::table('products')->where('id', $productbd->id)->update($productreq);
-        
+
                     DB::table('sales')->insert([
                         "product_id" => $productbd->id,
                         "stores_id" => $productbd->stores_id,
@@ -109,7 +110,7 @@ class SyncStoreProductsJob implements ShouldQueue
                         'created_at' => Carbon::now()->format('Y-m-d'),
                         'updated_at' => Carbon::now()->format('Y-m-d')
                     ]);
-            
-                    } 
+
+                    }
             });//shoudl be updated now //ok wait
 }

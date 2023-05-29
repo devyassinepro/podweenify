@@ -41,17 +41,17 @@ class Product extends Model
         'monthsales',
 
     ];
-    
+
     public function stores(): HasMany
     {
         return $this->hasMany(stores::class);
-        
+
     }
-    
+
     public function sales(): HasMany
     {
         return $this->hasMany(Sales::class);
-        
+
     }
 
     public function todaysales()

@@ -14,17 +14,17 @@ class ProcessCountProductsRevenue implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $sales;
+    public $Products;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($sales)
+    public function __construct($Products)
     {
         //
 
-        $this->sales = $sales;
+        $this->Products = $Products;
     }
 
     /**
@@ -35,11 +35,11 @@ class ProcessCountProductsRevenue implements ShouldQueue
     public function handle()
     {
         //
-        foreach($this->sales as $sale){
+        foreach($this->Products as $product){
             
             try {
                 
-                SyncCountProductsRevenue::dispatch($sale);
+                SyncCountProductsRevenue::dispatch($product);
             } catch(\Exception $exception) {
 
                 Log::error($exception->getMessage());

@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Product;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -16,17 +17,17 @@ use Illuminate\Support\Facades\DB;
 class SyncCountProductsRevenue implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    public $sale;
+    public $product;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($sale)
+    public function __construct($product)
     {
         //
-        $this->$sale = $sale;
+        $this->$product = $product;
     }
 
     /**
@@ -38,13 +39,13 @@ class SyncCountProductsRevenue implements ShouldQueue
     {
         //
 
-        $sale = $this->sale;
-
-        $countproducttoday=Sales::where('product_id','=',$sale->product_id)->withCount('product_id')->first();
+        $product = $this->product;
+        $countproductrevenue = Product::where('id', $product->id)->withCount(['todaysales', 'yesterdaysales'])->first();
         $productreqtoday = array(
-                'todaysales' => $countproducttoday->product_count,
+                'todaysales' => $countproductrevenue->todaysales_count,
+                'yesterdaysales' => $countproductrevenue->yesterdaysales_count,
             );
-            DB::table('products')->where('id', $sale->product_id)->update($productreqtoday);
+            DB::table('products')->where('id', $product->id)->update($productreqtoday);
 
 
     }
