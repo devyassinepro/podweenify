@@ -10,6 +10,7 @@ use App\Http\Controllers\DataController;
 use App\Http\Controllers\TestController;
 use App\Jobs\ProcessApiStoreJob;
 use App\Jobs\ProcessCountProductsRevenue;
+use App\Jobs\ProcessCountproductsRevenue as JobsProcessCountproductsRevenue;
 use App\Jobs\ProcessCountStoresRevenue;
 use App\Models\Sales;
 use Illuminate\Support\Facades\DB;
@@ -63,11 +64,11 @@ Route::get('/countstores',function (){
 
 // Start Queue every 4 Hours
 Route::get('/countProducts',function (){
-    $Products = Product::select("*")
+    $products = Product::select("*")
         ->whereDate('updated_at', '=', Carbon::today()->format('Y-m-d'))
         ->get();
-     ProcessCountProductsRevenue::dispatch($Products);
-      echo $Products; echo '<br />';
+     JobsProcessCountproductsRevenue::dispatch($products);
+      echo $products; echo '<br />';
 });
 
 

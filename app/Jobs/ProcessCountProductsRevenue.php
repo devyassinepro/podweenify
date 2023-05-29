@@ -10,21 +10,21 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
-class ProcessCountProductsRevenue implements ShouldQueue
+
+class ProcessCountproductsRevenue implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $Products;
+    public $products;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($Products)
+    public function __construct($products)
     {
-        //
 
-        $this->Products = $Products;
+        $this->products = $products;
     }
 
     /**
@@ -34,11 +34,10 @@ class ProcessCountProductsRevenue implements ShouldQueue
      */
     public function handle()
     {
-        //
-        foreach($this->Products as $product){
-            
+        foreach($this->products as $product){
+
             try {
-                
+
                 SyncCountProductsRevenue::dispatch($product);
             } catch(\Exception $exception) {
 
