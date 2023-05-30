@@ -8,23 +8,23 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class ProcessApiStoreJob implements ShouldQueue
+
+class ProcessCountproductsRevenue implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $stores;
-
+    public $products;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($stores)
+    public function __construct($products)
     {
-        $this->stores = $stores;
+
+        $this->products = $products;
     }
 
     /**
@@ -34,11 +34,11 @@ class ProcessApiStoreJob implements ShouldQueue
      */
     public function handle()
     {
-        foreach($this->stores as $store){
+        foreach($this->products as $product){
 
             try {
 
-                SyncStoreProductsJob::dispatch($store);
+                SyncCountProductsRevenue::dispatch($product);
             } catch(\Exception $exception) {
 
                 Log::error($exception->getMessage());
