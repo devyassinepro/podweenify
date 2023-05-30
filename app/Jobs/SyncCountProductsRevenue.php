@@ -34,6 +34,7 @@ class SyncCountProductsRevenue implements ShouldQueue
      */
     public function handle()
     {
+        sleep(5);
         $product = $this->product;
         $countproductrevenue = Product::where('id', $product->id)->withCount(['todaysales', 'yesterdaysales'])->first();
         $productreqtoday = array(
