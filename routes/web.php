@@ -9,8 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DataController;
 use App\Http\Controllers\TestController;
 use App\Jobs\ProcessApiStoreJob;
-use App\Jobs\ProcessCountProductsRevenue;
-use App\Jobs\ProcessCountproductsRevenue as JobsProcessCountproductsRevenue;
+use App\Jobs\ProcessCountproductsRevenue;
 use App\Jobs\ProcessCountStoresRevenue;
 use App\Models\Sales;
 use Illuminate\Support\Facades\DB;
@@ -67,7 +66,7 @@ Route::get('/countProducts',function (){
     $products = Product::select("*")
         ->whereDate('updated_at', '=', Carbon::today()->format('Y-m-d'))
         ->get();
-     JobsProcessCountproductsRevenue::dispatch($products);
+        ProcessCountproductsRevenue::dispatch($products);
       echo $products; echo '<br />';
 });
 
