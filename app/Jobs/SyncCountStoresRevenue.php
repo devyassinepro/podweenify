@@ -37,17 +37,23 @@ class SyncCountStoresRevenue implements ShouldQueue
         sleep(5);
         $store = $this->store;
         $storescounter = stores::where('id',$store->id)->withSum('products', 'totalsales')
-        ->withSum('products', 'revenue')->first();
+        ->withSum('products', 'revenue')->withCount(['todaysales', 'yesterdaysales', 'day3sales', 'day4sales', 'day5sales', 'day6sales', 'day7sales'])->first();
 
         $storeCountStoresRevenue = array(
             'revenue' => $storescounter->products_sum_revenue,
             'sales' => $storescounter->products_sum_totalsales,
-            
+            'todaysales'=> $storescounter->todaysales_count,
+            'yesterdaysales'=> $storescounter->yesterdaysales_count,
+            'day3sales'=> $storescounter->day3sales_count,
+            'day4sales'=> $storescounter->day4sales_count,
+            'day5sales'=> $storescounter->day5sales_count,
+            'day6sales'=> $storescounter->day6sales_count,
+            'day7sales'=> $storescounter->day7sales_count,
         );
         $storeStopUpdate = array(
-            'status' => 0,            
+            'status' => 0,
         );
-        // if no movement in 7 days Stop Update store 
+        // if no movement in 7 days Stop Update store
         if( $storescounter->products_sum_totalsales == 0 &&  $storescounter->created_at > Carbon::now()->subDays(6)->format('Y-m-d')){
             DB::table('stores')->where('id', $storescounter->id)->update($storeStopUpdate);
 

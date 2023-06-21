@@ -24,8 +24,17 @@ class CreateStoresTable extends Migration
             $table->string('currency');
             $table->string('shopifydomain');
             $table->integer('sales');
-            $table->integer('allproducts'); 
+            $table->integer('allproducts');
             $table->integer('user_id');
+            $table->integer('todaysales');
+            $table->integer('yesterdaysales');
+            $table->integer('day3sales');
+            $table->integer('day4sales');
+            $table->integer('day5sales');
+            $table->integer('day6sales');
+            $table->integer('day7sales');
+            $table->integer('weeksales');
+            $table->integer('monthsales');
             $table->timestamps();
         });
     }

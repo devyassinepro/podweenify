@@ -32,7 +32,16 @@ class stores extends Model
         'shopifydomain',
         'sales',
         'allproducts',
-        'user_id'
+        'user_id',
+        'todaysales',
+        'yesterdaysales',
+        'day3sales',
+        'day4sales',
+        'day5sales',
+        'day6sales',
+        'day7sales',
+        'weeksales',
+        'monthsales',
     ];
     public function niches(){
         return $this->belongsToMany(Niche::class);
@@ -41,12 +50,12 @@ class stores extends Model
     public function products()
     {
         return $this->hasMany(Product::class);
-        
+
     }
     public function sales()
     {
         return $this->hasMany(Sales::class);
-        
+
     }
     public function todaysales()
     {
@@ -85,5 +94,5 @@ class stores extends Model
 
     protected $table = 'stores';
 
-    
+
 }

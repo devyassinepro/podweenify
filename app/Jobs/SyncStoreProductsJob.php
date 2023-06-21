@@ -78,7 +78,10 @@ class SyncStoreProductsJob implements ShouldQueue
             $products = json_decode($html)->products;
             collect($products)->map(function ($product) {
 
+                // $productnotfound=DB::table('products')->where('id', '!=',$product->id)->first();
+                // if($productnotfound){
 
+                // }
                 $productbd = DB::table('products')->where('id', $product->id)->where('timesparam', '!=', strtotime($product->updated_at))->first();
                 if($productbd) {
 
