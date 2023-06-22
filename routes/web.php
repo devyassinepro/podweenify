@@ -11,6 +11,7 @@ use App\Http\Controllers\TestController;
 use App\Jobs\ProcessApiStoreJob;
 use App\Jobs\ProcessCountproductsRevenue;
 use App\Jobs\ProcessCountStoresRevenue;
+use App\Jobs\Process24storesRevenue;
 use App\Models\Sales;
 use Illuminate\Support\Facades\DB;
 
@@ -58,6 +59,16 @@ Route::get('/countstores',function (){
         ->get();
 
      ProcessCountStoresRevenue::dispatch($stores);
+      echo $stores; echo '<br />';
+});
+
+// Start Queue every 24 Hours
+Route::get('/countstoresdaily',function (){
+    $stores = Stores::select("*")
+        ->where('status','1')
+        ->get();
+
+        Process24storesRevenue::dispatch($stores);
       echo $stores; echo '<br />';
 });
 

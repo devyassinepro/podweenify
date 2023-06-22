@@ -11,7 +11,9 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\stores;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-class SyncCountStoresRevenue implements ShouldQueue
+
+
+class Sync24storesRevenue implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -26,6 +28,7 @@ class SyncCountStoresRevenue implements ShouldQueue
     {
         $this->store = $store;
     }
+
     /**
      * Execute the job.
      *
@@ -36,13 +39,15 @@ class SyncCountStoresRevenue implements ShouldQueue
         //
         sleep(5);
         $store = $this->store;
-        $storescounter = stores::where('id',$store->id)->withSum('products', 'totalsales')
-        ->withSum('products', 'revenue')->withCount(['todaysales'])->first();
+        $storescounter = stores::where('id',$store->id)->first();
 
         $storeCountStoresRevenue = array(
-            'revenue' => $storescounter->products_sum_revenue,
-            'sales' => $storescounter->products_sum_totalsales,
-            'todaysales'=> $storescounter->todaysales_count
+            'yesterdaysales'=> $storescounter->todaysales,
+            'day3sales'=> $storescounter->yesterdaysales,
+            'day4sales'=> $storescounter->day3sales,
+            'day5sales'=> $storescounter->day4sales,
+            'day6sales'=> $storescounter->day5sales,
+            'day7sales'=> $storescounter->day6sales,
         );
         $storeStopUpdate = array(
             'status' => 0,
