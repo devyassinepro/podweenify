@@ -11,11 +11,13 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\stores;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
+
 
 
 class Sync24storesRevenue implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, IsMonitored;
 
     public $store;
 
