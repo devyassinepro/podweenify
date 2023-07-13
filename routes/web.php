@@ -14,6 +14,8 @@ use App\Jobs\ProcessCountStoresRevenue;
 use App\Jobs\Process24storesRevenue;
 use App\Models\Sales;
 use Illuminate\Support\Facades\DB;
+use Laravel\Horizon\Http\Controllers\HorizonController;
+
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -40,6 +42,7 @@ Route::get('/', function () {
 
 Route::resource('affiche', TestController::class);
 
+Route::get('/horizon', [HorizonController::class, 'index']);
 
 
 // Start Queue every 2 min
