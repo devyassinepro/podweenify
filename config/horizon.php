@@ -180,6 +180,19 @@ return [
     */
 
     'defaults' => [
+        'supervisor-0' => [
+            'connection' => 'redis',
+            'queue' => ['default'],
+            'balance' => 'auto',
+            'autoScalingStrategy' => 'time',
+            'maxProcesses' => 1,
+            'maxTime' => 0,
+            'maxJobs' => 0,
+            'memory' => 128,
+            'tries' => 1,
+            'timeout' => 60,
+            'nice' => 0,
+        ],
         'supervisor-1' => [
             'connection' => 'redis',
             'queue' => ['Tracksales'],
