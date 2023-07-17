@@ -18,7 +18,7 @@ class Sync24storesRevenue implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $queue = 'CountAlldayRevenue';
+    // public $queue = 'CountAlldayRevenue';
 
     public $store;
 
