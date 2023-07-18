@@ -16,6 +16,7 @@ class ProcessApiStoreJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $queue = 'Tracksales';
     public $stores;
 
     /**
