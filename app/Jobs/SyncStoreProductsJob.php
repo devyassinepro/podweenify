@@ -16,7 +16,6 @@ class SyncStoreProductsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    // public $queue = 'Tracksales';
 
     public $store;
 
