@@ -39,7 +39,7 @@ class ProcessCountproductsRevenue implements ShouldQueue
 
             try {
 
-                SyncCountProductsRevenue::dispatch($product);
+                SyncCountProductsRevenue::dispatch($product)->onQueue('countproductrevenue');
             } catch(\Exception $exception) {
 
                 Log::error($exception->getMessage());

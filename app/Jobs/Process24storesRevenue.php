@@ -38,7 +38,7 @@ class Process24storesRevenue implements ShouldQueue
 
             try {
 
-                Sync24storesRevenue::dispatch($store);
+                Sync24storesRevenue::dispatch($store)->onQueue('daycounter');
             } catch(\Exception $exception) {
 
                 Log::error($exception->getMessage());

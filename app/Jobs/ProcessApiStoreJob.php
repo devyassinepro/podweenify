@@ -39,7 +39,7 @@ class ProcessApiStoreJob implements ShouldQueue
 
             try {
 
-                SyncStoreProductsJob::dispatch($store);
+                SyncStoreProductsJob::dispatch($store)->onQueue('tracksales');
             } catch(\Exception $exception) {
 
                 Log::error($exception->getMessage());
