@@ -105,65 +105,66 @@ class SyncCountStoresRevenue implements ShouldQueue
 
     }
 
-    function addNewproduct ($store, $i){
-        $opts = array('http'=>array('header' => "User-Agent:MyAgent/1.0\r\n"));
-        $context = stream_context_create($opts);
-        $html = file_get_contents($store->url.'products.json?page='.$i.'&limit=250',false,$context);
-        $products = json_decode($html)->products;
+}
 
-        collect($products)->map(function ($product) use ($store){
-            
-            $productbd = DB::table('products')->where('id', '=', $product->id)->first();
+function addNewproduct ($store, $i){
+    $opts = array('http'=>array('header' => "User-Agent:MyAgent/1.0\r\n"));
+    $context = stream_context_create($opts);
+    $html = file_get_contents($store->url.'products.json?page='.$i.'&limit=250',false,$context);
+    $products = json_decode($html)->products;
 
-            if (!$productbd) {
+    collect($products)->map(function ($product) use ($store){
+        
+        $productbd = DB::table('products')->where('id', '=', $product->id)->first();
 
-                if(isset($product->variants[0]->price)){
-                    $price= $product->variants[0]->price;
-                }else{
-                    $price=0;
+        if (!$productbd) {
+
+            if(isset($product->variants[0]->price)){
+                $price= $product->variants[0]->price;
+            }else{
+                $price=0;
+            }
+            if(isset($product->images[0]->src)){
+                $image= $product->images[0]->src;
+            }else{
+                $image="default";
+            }
+
+            $timeconvert = strtotime($product->updated_at);
+            $totalsales = 0;
+            $urlproduct = $store->url.'products/'.$product->handle;
+
+              Product::firstOrCreate([
+                            "id" => $product->id,
+                            "title" => $product->title,
+                            "timesparam" => $timeconvert,
+                            "prix" => $price,
+                            "revenue" => 0,
+                            "stores_id" => $store->id,
+                            "url" => $urlproduct,
+                            "imageproduct" => $image,
+                            "favoris" => 0,
+                            "totalsales" => $totalsales,
+                            "todaysales" => 0,
+                            "yesterdaysales" => 0,
+                            "day3sales" => 0,
+                            "day4sales" => 0,
+                            "day5sales" => 0,
+                            "day6sales" => 0,
+                            "day7sales" => 0,
+                            "weeksales" => 0,
+                            "monthsales" => 0
+                        ]);
+
                 }
-                if(isset($product->images[0]->src)){
-                    $image= $product->images[0]->src;
-                }else{
-                    $image="default";
-                }
+    });
+          //update number of products
+          $updatenumberofnewproduct = array(
+            'allproducts' => $totalproductslive,
+        );
+        DB::table('stores')->where('id', $store->id)->update($updatenumberofnewproduct);
 
-                $timeconvert = strtotime($product->updated_at);
-                $totalsales = 0;
-                $urlproduct = $store->url.'products/'.$product->handle;
-
-                  Product::firstOrCreate([
-                                "id" => $product->id,
-                                "title" => $product->title,
-                                "timesparam" => $timeconvert,
-                                "prix" => $price,
-                                "revenue" => 0,
-                                "stores_id" => $store->id,
-                                "url" => $urlproduct,
-                                "imageproduct" => $image,
-                                "favoris" => 0,
-                                "totalsales" => $totalsales,
-                                "todaysales" => 0,
-                                "yesterdaysales" => 0,
-                                "day3sales" => 0,
-                                "day4sales" => 0,
-                                "day5sales" => 0,
-                                "day6sales" => 0,
-                                "day7sales" => 0,
-                                "weeksales" => 0,
-                                "monthsales" => 0
-                            ]);
-
-                    }
-        });
-              //update number of products
-              $updatenumberofnewproduct = array(
-                'allproducts' => $totalproductslive,
-            );
-            DB::table('stores')->where('id', $store->id)->update($updatenumberofnewproduct);
-    
-            echo $totalproductslive; echo '<br />';
+        echo $totalproductslive; echo '<br />';
 
 
-    }
 }
