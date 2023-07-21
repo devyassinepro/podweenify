@@ -63,10 +63,19 @@ class SyncStoreProductsJob implements ShouldQueue
     }
 
 }
+
+//check if we have new products in the store 
+
     function updatesales($store , $i){
             $opts = array('http'=>array('header' => "User-Agent:MyAgent/1.0\r\n"));
             $context = stream_context_create($opts);
             $html = file_get_contents($store.'products.json?page='.$i.'&limit=250',false,$context);
+          
+            // $meta = file_get_contents($store.'meta.json',false,$context);
+            // $metas = json_decode($meta);
+            // $totalproductslive = $metas->published_products_count;
+
+            // $storeproductsDB = DB::table('stores')->where('id', $product->id)->where('timesparam', '!=', strtotime($product->updated_at))->first();
 
 
             DB::table('apistatuses')->insert([

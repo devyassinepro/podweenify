@@ -11,6 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\stores;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Models\Product;
 
 
 
@@ -47,12 +48,9 @@ class SyncCountStoresRevenue implements ShouldQueue
             $meta = file_get_contents($store->url.'meta.json',false,$context);
             $metas = json_decode($meta);
             $totalproductslive = $metas->published_products_count;
-
-            echo $metas->published_products_count; echo '<br />';
-
+            
             //to compare with database 
             $storeproductsDB = DB::table('stores')->where('id', $store->id)->first();
-            echo $storeproductsDB->allproducts; echo '<br />';
 
             if($totalproductslive != $storeproductsDB->allproducts){
                 if($store->allproducts<=250 ){
@@ -81,7 +79,7 @@ class SyncCountStoresRevenue implements ShouldQueue
 
         } catch(\Exception $exception) {
 
-            Log::error($exception->getMessage());
+            // Log::error($exception->getMessage());
         }
         //count stores revenue
 
@@ -164,7 +162,6 @@ function addNewproduct ($store, $i){
         );
         DB::table('stores')->where('id', $store->id)->update($updatenumberofnewproduct);
 
-        echo $totalproductslive; echo '<br />';
 
 
 }
