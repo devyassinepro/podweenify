@@ -42,7 +42,7 @@ class SyncCountProductsRevenue implements ShouldQueue
                 'todaysales' => $countproductrevenue->todaysales_count,
                 'yesterdaysales' => $countproductrevenue->yesterdaysales_count,
             );
-            DB::table('products')->where('id', $product->id)->update($productreqtoday);
+        DB::table('products')->where('id', $product->id)->update($productreqtoday);
 
     }
 }

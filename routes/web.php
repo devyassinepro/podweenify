@@ -55,7 +55,7 @@ Route::get('/start',function (){
       echo $stores; echo '<br />';
 });
 
-// Start Queue every 5 Hours
+// Start Queue every 2 Hours
 Route::get('/countstores',function (){
     $stores = Stores::select("*")
         ->where('status','1')
@@ -65,11 +65,11 @@ Route::get('/countstores',function (){
       echo $stores; echo '<br />';
 });
 
-// Start Queue every 24 Hours
+// Start Queue every 24 Hours stores and products
 Route::get('/countstoresdaily',function (){
-    $stores = Stores::select("*")
-        ->where('status','1')
-        ->get();
+        $stores = Stores::select("*")
+                ->where('status','1')
+                ->get();
 
         Process24storesRevenue::dispatch($stores);
       echo $stores; echo '<br />';
@@ -83,6 +83,127 @@ Route::get('/countProducts',function (){
         ProcessCountproductsRevenue::dispatch($products);
       echo $products; echo '<br />';
 });
+
+
+// Start Queue every 4 Hours
+Route::get('/testcountProducts',function (){
+    // $products = Product::select("*")
+    //     ->whereDate('updated_at', '=', Carbon::today()->format('Y-m-d'))
+    //     ->get();
+        // ProcessCountproductsRevenue::dispatch($products);
+
+
+        $product = 7714800402643;
+        $countproductrevenue = Product::where('id', $product)->withCount(['todaysales', 'yesterdaysales'])->first();
+        $productreqtoday = array(
+                'todaysales' => $countproductrevenue->todaysales_count,
+                'yesterdaysales' => $countproductrevenue->yesterdaysales_count,
+            );
+            DB::table('products')->where('id', $product)->update($productreqtoday);
+      echo $product; echo '<br />';
+});
+
+// Start Queue every 4 Hours
+Route::get('/testaddnewproduct',function (){
+
+
+    try {
+        $store = Stores::select("*")
+        ->where('id','4')
+        ->first();
+        echo $store->url; echo '<br />';
+
+        $opts = array('http'=>array('header' => "User-Agent:MyAgent/1.0\r\n"));
+        $context = stream_context_create($opts);
+        $meta = file_get_contents($store->url.'meta.json',false,$context);
+        $metas = json_decode($meta);
+        $totalproductslive = $metas->published_products_count;
+
+        echo $metas->published_products_count; echo '<br />';
+
+
+        //to compare with database 
+        $storeproductsDB = DB::table('stores')->where('id', $store->id)->first();
+
+        echo $storeproductsDB->allproducts; echo '<br />';
+
+        if($totalproductslive != $storeproductsDB->allproducts){
+
+                for ($i = 1; $i <= 3; $i++) {
+                 
+                    $opts = array('http'=>array('header' => "User-Agent:MyAgent/1.0\r\n"));
+                    $context = stream_context_create($opts);
+                    $html = file_get_contents($store->url.'products.json?page='.$i.'&limit=250',false,$context);
+                    $products = json_decode($html)->products;
+  
+
+                    collect($products)->map(function ($product) use ($store){
+
+                        $productbd = DB::table('products')->where('id', '=', $product->id)->first();
+
+
+                        if (!$productbd) {
+
+                            if(isset($product->variants[0]->price)){
+                                $price= $product->variants[0]->price;
+                            }else{
+                                $price=0;
+                            }
+                            if(isset($product->images[0]->src)){
+                                $image= $product->images[0]->src;
+                            }else{
+                                $image="default";
+                            }
+
+                            $timeconvert = strtotime($product->updated_at);
+                            $totalsales = 0;
+
+                            $urlproduct = $store->url.'products/'.$product->handle;
+
+                            Product::firstOrCreate([
+                                "id" => $product->id,
+                                "title" => $product->title,
+                                "timesparam" => $timeconvert,
+                                "prix" => $price,
+                                "revenue" => 0,
+                                "stores_id" => $store->id,
+                                "url" => $urlproduct,
+                                "imageproduct" => $image,
+                                "favoris" => 0,
+                                "totalsales" => $totalsales,
+                                "todaysales" => 0,
+                                "yesterdaysales" => 0,
+                                "day3sales" => 0,
+                                "day4sales" => 0,
+                                "day5sales" => 0,
+                                "day6sales" => 0,
+                                "day7sales" => 0,
+                                "weeksales" => 0,
+                                "monthsales" => 0
+                            ]);
+                                        }
+                    });
+                        //update number of products
+                        $updatenumberofnewproduct = array(
+                            'allproducts' => $totalproductslive,
+                        );
+                        DB::table('stores')->where('id', $store->id)->update($updatenumberofnewproduct);
+                
+                        echo $totalproductslive; echo '<br />';
+        
+                }
+
+        }
+
+    } catch(\Exception $exception) {
+
+        Log::error($exception->getMessage());
+    }
+
+});
+
+
+
 
 
 //test 1 store
@@ -158,3 +279,68 @@ Route::get('/starttest',function (){
 
 
 });
+
+
+
+
+function addNewproduct ($store, $i){
+    $opts = array('http'=>array('header' => "User-Agent:MyAgent/1.0\r\n"));
+    $context = stream_context_create($opts);
+    $html = file_get_contents($store->url.'products.json?page='.$i.'&limit=250',false,$context);
+    $products = json_decode($html)->products;
+
+
+    collect($products)->map(function ($product) {
+        
+        $productbd = DB::table('products')->where('id', '!=', $product->id)->first();
+
+        if($productbd) {
+
+            if(isset($product->variants[0]->price)){
+                $price= $product->variants[0]->price;
+            }else{
+                $price=0;
+            }
+            if(isset($product->images[0]->src)){
+                $image= $product->images[0]->src;
+            }else{
+                $image="default";
+            }
+
+            $timeconvert = strtotime($product->updated_at);
+            $totalsales = 0;
+            $urlproduct = $store.'products/'.$product->handle;
+            Product::firstOrCreate([
+                "id" => $product->id,
+                "title" => $product->title,
+                "timesparam" => $timeconvert,
+                "prix" => $price,
+                "revenue" => 0,
+                "stores_id" => $store_id,
+                "url" => $urlproduct,
+                "imageproduct" => $image,
+                "favoris" => 0,
+                "totalsales" => $totalsales,
+                "todaysales" => 0,
+                "yesterdaysales" => 0,
+                "day3sales" => 0,
+                "day4sales" => 0,
+                "day5sales" => 0,
+                "day6sales" => 0,
+                "day7sales" => 0,
+                "weeksales" => 0,
+                "monthsales" => 0
+            ]);
+
+            echo $product->title; echo '<br />';
+                }
+    });
+        //update number of products
+        $updatenumberofnewproduct = array(
+            'allproducts' => $totalproductslive,
+        );
+        DB::table('stores')->where('id', $store->id)->update($updatenumberofnewproduct);
+
+        echo $totalproductslive; echo '<br />';
+
+}

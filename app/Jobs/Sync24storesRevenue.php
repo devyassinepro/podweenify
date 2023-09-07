@@ -38,10 +38,9 @@ class Sync24storesRevenue implements ShouldQueue
     public function handle()
     {
         //
-        sleep(5);
+        sleep(2);
         $store = $this->store;
         $storescounter = stores::where('id',$store->id)->first();
-
         $storeCountStoresRevenue = array(
             'yesterdaysales'=> $storescounter->todaysales,
             'day3sales'=> $storescounter->yesterdaysales,
@@ -59,6 +58,27 @@ class Sync24storesRevenue implements ShouldQueue
 
         }
         DB::table('stores')->where('id', $storescounter->id)->update($storeCountStoresRevenue);
+
+        //After 24 hours update also products  
+        $productcounters = Product::where('stores_id',$store->id)
+                        ->where('todaysales', '>=', 1)
+                        ->get();
+  
+            foreach($productcounters as $product){
+            
+                $productcounter = Product::where('id',$product->id)->first();
+                $productCountStoresRevenue = array(
+                    'yesterdaysales'=> $productcounter->todaysales,
+                    'day3sales'=> $productcounter->yesterdaysales,
+                    'day4sales'=> $productcounter->day3sales,
+                    'day5sales'=> $productcounter->day4sales,
+                    'day6sales'=> $productcounter->day5sales,
+                    'day7sales'=> $productcounter->day6sales,
+                );
+        
+                DB::table('products')->where('id', $productcounter->id)->update($productCountStoresRevenue);
+    
+            }
 
     }
 }
