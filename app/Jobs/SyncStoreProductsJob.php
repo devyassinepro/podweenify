@@ -78,12 +78,12 @@ class SyncStoreProductsJob implements ShouldQueue
             // $storeproductsDB = DB::table('stores')->where('id', $product->id)->where('timesparam', '!=', strtotime($product->updated_at))->first();
 
 
-            DB::table('apistatuses')->insert([
-                "store" => $store,
-                "status" => $http_response_header[0],
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now()
-            ]);
+            // DB::table('apistatuses')->insert([
+            //     "store" => $store,
+            //     "status" => $http_response_header[0],
+            //     'created_at' => Carbon::now(),
+            //     'updated_at' => Carbon::now()
+            // ]);
 
             // echo $responsecode;
             $products = json_decode($html)->products;
@@ -99,8 +99,11 @@ class SyncStoreProductsJob implements ShouldQueue
                     //Ajouter La partie calcule Revenue chaque jours de la semaines
 
                     $sales = $productbd->totalsales;
+                    $todaysalesupdate = $productbd->todaysales;
+
                     $revenuenow = $productbd->revenue + $productbd->prix;
                     $sales ++ ;
+                    $todaysalesupdate ++ ;
                     //echo $sales;
                     $timestt = strtotime($product->updated_at);
                     $productreq = array(
@@ -111,6 +114,7 @@ class SyncStoreProductsJob implements ShouldQueue
                         'stores_id' => $productbd->stores_id,
                         'imageproduct' => $product->images[0]->src,
                         'favoris' => $productbd->favoris,
+                        'todaysales' => $todaysalesupdate,
                         'totalsales' => $sales,
                         'updated_at' => Carbon::now()->format('Y-m-d'),
                     );

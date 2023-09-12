@@ -42,6 +42,7 @@ class Sync24storesRevenue implements ShouldQueue
         $store = $this->store;
         $storescounter = stores::where('id',$store->id)->first();
         $storeCountStoresRevenue = array(
+            'todaysales'=> 0,
             'yesterdaysales'=> $storescounter->todaysales,
             'day3sales'=> $storescounter->yesterdaysales,
             'day4sales'=> $storescounter->day3sales,
@@ -68,6 +69,7 @@ class Sync24storesRevenue implements ShouldQueue
             
                 $productcounter = Product::where('id',$product->id)->first();
                 $productCountStoresRevenue = array(
+                    'todaysales'=> 0,
                     'yesterdaysales'=> $productcounter->todaysales,
                     'day3sales'=> $productcounter->yesterdaysales,
                     'day4sales'=> $productcounter->day3sales,
