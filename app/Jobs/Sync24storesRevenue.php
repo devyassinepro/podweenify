@@ -8,10 +8,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Models\stores;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use App\Models\Product;
 
 
 
@@ -41,7 +39,7 @@ class Sync24storesRevenue implements ShouldQueue
         //
         sleep(2);
         $store = $this->store;
-        $storescounter = stores::where('id',$store->id)->first();
+        $storescounter = DB::table('stores')->where('id',$store->id)->first();
         $storeCountStoresRevenue = array(
             'todaysales'=> 0,
             'yesterdaysales'=> $storescounter->todaysales,
@@ -60,7 +58,6 @@ class Sync24storesRevenue implements ShouldQueue
 
         }
         DB::table('stores')->where('id', $storescounter->id)->update($storeCountStoresRevenue);
-
         //After 24 hours update also products  
         $productcounters = Product::where('stores_id',$store->id)
                         ->where('todaysales', '>=', 1)
