@@ -11,6 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\stores;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Models\Product;
 
 
 
