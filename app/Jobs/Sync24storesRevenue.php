@@ -51,14 +51,14 @@ class Sync24storesRevenue implements ShouldQueue
             'day6sales'=> $storescounter->day5sales,
             'day7sales'=> $storescounter->day6sales,
         );
-        $storeStopUpdate = array(
-            'status' => 0,
-        );
-        // if no movement in 7 days Stop Update store
-        if( $storescounter->products_sum_totalsales == 0 &&  $storescounter->created_at > Carbon::now()->subDays(6)->format('Y-m-d')){
-            DB::table('stores')->where('id', $storescounter->id)->update($storeStopUpdate);
+        // $storeStopUpdate = array(
+        //     'status' => 0,
+        // );
+        // // if no movement in 7 days Stop Update store
+        // if( $storescounter->products_sum_totalsales == 0 &&  $storescounter->created_at > Carbon::now()->subDays(6)->format('Y-m-d')){
+        //     DB::table('stores')->where('id', $storescounter->id)->update($storeStopUpdate);
 
-        }
+        // }
         DB::table('stores')->where('id', $storescounter->id)->update($storeCountStoresRevenue);
         //After 24 hours update also products  
         $productcounters = Product::where('stores_id',$store->id)
