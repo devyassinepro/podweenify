@@ -10,6 +10,9 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+use GuzzleHttp\Client;
+
 
 
 class SyncStoreProductsJob implements ShouldQueue
@@ -18,15 +21,17 @@ class SyncStoreProductsJob implements ShouldQueue
 
 
     public $store;
+    public $currentProxy;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($store)
+    public function __construct($store,$currentProxy)
     {
         $this->store = $store;
+        $this->currentProxy = $currentProxy;
     }
 
     /**
@@ -36,99 +41,91 @@ class SyncStoreProductsJob implements ShouldQueue
      */
     public function handle()
     {
-         sleep(1);
         $store = $this->store;
-        if($store['allproducts']<=250 ){
+        $currentProxy = $this->currentProxy;
 
-            updatesales($store['url'],1);
+        $storeid = $store['id'];
 
-    }else if($store['allproducts']<=500){
+        $urls = DB::table('products')
+        ->where('stores_id', $storeid)
+        ->take(10)
+        ->pluck('url')
+        ->toArray();
+                
+        // $requestCount = 0; // Initialize the request count
 
-        for ($i = 1; $i <= 2; $i++) {
-            updatesales($store['url'],$i);
 
-        }
+        foreach ($urls as $url) {
+  
+            $client = new Client([
+                            'timeout' => 10,
+                            'proxy' => $currentProxy,
+                        ]);
+        // Make an HTTP request using Guzzle
+        try {
+       $response = $client->get($url . '.json');
+       $html = $response->getBody()->getContents();
 
-    }else if($store['allproducts']<=750){
-        for ($i = 1; $i <= 3; $i++) {
-            updatesales($store['url'],$i);
+       // Process the response as needed
+       if ($response->getStatusCode() === 200) {
+           $product = json_decode($html)->product;
+           // Process and update the product data in the database
+            // Assuming $product and $currentProxy are defined elsewhere in your code
+            // $productTitle = $product->title;
+            // $updatedAt = $product->updated_at;
+            // $message = "Product update: $productTitle  Update at: $updatedAt \n Using Proxy: $currentProxy";
+            // Log::info($message);
 
-        }
-    }else if($store['allproducts']<=1000){
-            for ($i = 1; $i <= 4; $i++) {
-                updatesales($store['url'],$i);
-            }
-    }
+               $productbd = DB::table('products')->where('id', $product->id)->where('timesparam', '!=', strtotime($product->updated_at))->first();
+               if($productbd) {
 
-    }
+                    // $message = "Product Sale: $productTitle\nUpdate at: $updatedAt\nUsing Proxy: $currentProxy";
 
+                   $sales = $productbd->totalsales;
+                   $todaysalesupdate = $productbd->todaysales;
+
+                   $revenuenow = $productbd->revenue + $productbd->prix;
+                   $sales ++ ;
+                   $todaysalesupdate ++ ;
+                   //echo $sales;
+                   $timestt = strtotime($product->updated_at);
+                   $productreq = array(
+                       'title' => $product->title,
+                       'timesparam' => $timestt,
+                       'prix' => $product->variants[0]->price,
+                       'revenue' => $revenuenow,
+                       'stores_id' => $productbd->stores_id,
+                       'imageproduct' => $product->images[0]->src,
+                       'favoris' => $productbd->favoris,
+                       'todaysales' => $todaysalesupdate,
+                       'totalsales' => $sales,
+                       'updated_at' => Carbon::now()->format('Y-m-d'),
+                   );
+
+                   DB::table('products')->where('id', $productbd->id)->update($productreq);
+
+                   DB::table('sales')->insert([
+                       "product_id" => $productbd->id,
+                       "stores_id" => $productbd->stores_id,
+                       "prix" => $productbd->prix,
+                       'created_at' => Carbon::now()->format('Y-m-d'),
+                       'updated_at' => Carbon::now()->format('Y-m-d')
+                   ]);
+
+                   }
+       }
+   } catch (\Exception $e) {
+       // Handle exceptions (e.g., connection errors, timeouts) and log errors
+       Log::error($e->getMessage());
+   }
+
+   // Increment the request count
+//    $requestCount++;
+
+   // Sleep for a brief moment between requests to avoid overwhelming the proxy and server
+   sleep(1); // Adjust this as needed
 }
+   
+    }
 
-//check if we have new products in the store 
-
-    function updatesales($store , $i){
-            $opts = array('http'=>array('header' => "User-Agent:MyAgent/1.0\r\n"));
-            $context = stream_context_create($opts);
-            $html = file_get_contents($store.'products.json?page='.$i.'&limit=250',false,$context);
-          
-            // $meta = file_get_contents($store.'meta.json',false,$context);
-            // $metas = json_decode($meta);
-            // $totalproductslive = $metas->published_products_count;
-
-            // $storeproductsDB = DB::table('stores')->where('id', $product->id)->where('timesparam', '!=', strtotime($product->updated_at))->first();
-
-
-            // DB::table('apistatuses')->insert([
-            //     "store" => $store,
-            //     "status" => $http_response_header[0],
-            //     'created_at' => Carbon::now(),
-            //     'updated_at' => Carbon::now()
-            // ]);
-
-            // echo $responsecode;
-            $products = json_decode($html)->products;
-            collect($products)->map(function ($product) {
-
-                // $productnotfound=DB::table('products')->where('id', '!=',$product->id)->first();
-                // if($productnotfound){
-
-                // }
-                $productbd = DB::table('products')->where('id', $product->id)->where('timesparam', '!=', strtotime($product->updated_at))->first();
-                if($productbd) {
-
-                    //Ajouter La partie calcule Revenue chaque jours de la semaines
-
-                    $sales = $productbd->totalsales;
-                    $todaysalesupdate = $productbd->todaysales;
-
-                    $revenuenow = $productbd->revenue + $productbd->prix;
-                    $sales ++ ;
-                    $todaysalesupdate ++ ;
-                    //echo $sales;
-                    $timestt = strtotime($product->updated_at);
-                    $productreq = array(
-                        'title' => $product->title,
-                        'timesparam' => $timestt,
-                        'prix' => $product->variants[0]->price,
-                        'revenue' => $revenuenow,
-                        'stores_id' => $productbd->stores_id,
-                        'imageproduct' => $product->images[0]->src,
-                        'favoris' => $productbd->favoris,
-                        'todaysales' => $todaysalesupdate,
-                        'totalsales' => $sales,
-                        'updated_at' => Carbon::now()->format('Y-m-d'),
-                    );
-
-                    DB::table('products')->where('id', $productbd->id)->update($productreq);
-
-                    DB::table('sales')->insert([
-                        "product_id" => $productbd->id,
-                        "stores_id" => $productbd->stores_id,
-                        "prix" => $productbd->prix,
-                        'created_at' => Carbon::now()->format('Y-m-d'),
-                        'updated_at' => Carbon::now()->format('Y-m-d')
-                    ]);
-
-                    }
-            });//shoudl be updated now //ok wait
 }
