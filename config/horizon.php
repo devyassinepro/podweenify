@@ -228,4 +228,8 @@ return [
             ],
         ],
     ],
+    // Add the 'purge' option to configure the number of failed jobs to retain
+'purge' => [
+    'recent_failed_jobs' => 10000, // Set the desired number of failed jobs to retain
+],
 ];
