@@ -123,7 +123,7 @@ class SyncStoreProductsJob implements ShouldQueue
 //    $requestCount++;
 
    // Sleep for a brief moment between requests to avoid overwhelming the proxy and server
-   sleep(1); // Adjust this as needed
+//    sleep(1); // Adjust this as needed
 }
    
     }
