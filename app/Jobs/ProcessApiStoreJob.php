@@ -38,8 +38,6 @@ class ProcessApiStoreJob implements ShouldQueue
     public function handle()
     {
 
-        $requestCount = 0; // Initialize the request count
-        
         $proxies = [
             'http://fkmroqdf:e7bqbxml5sfv@45.43.65.21:6535',
             'http://fkmroqdf:e7bqbxml5sfv@138.128.145.78:5997',
@@ -144,6 +142,9 @@ class ProcessApiStoreJob implements ShouldQueue
             // Add more proxy servers as needed
         ];
 
+
+        $requestCount = 0; // Initialize the request count
+        
 
            $currentProxyIndex = 0; // Initialize the proxy index
 
