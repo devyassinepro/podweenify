@@ -221,7 +221,7 @@ Route::get('/removestore',function (){
 Route::get('/bigdata',function (){
 
         $storesurl = [
-            'bumpboxx.com',
+            'campfirearts.com',
         ];
 
         ProcessProductResearch::dispatch($storesurl);
