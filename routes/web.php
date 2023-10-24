@@ -221,11 +221,13 @@ Route::get('/removestore',function (){
 Route::get('/bigdata',function (){
 
         $storesurl = [
-            'campfirearts.com',
+            'cashmerechoice.com',
+            'catholicplanner.com',
+            'celex.com',
+            'dudeperfect.store',
         ];
 
         ProcessProductResearch::dispatch($storesurl);
-
 
 });
 
