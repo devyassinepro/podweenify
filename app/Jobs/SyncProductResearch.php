@@ -115,6 +115,8 @@ class SyncProductResearch implements ShouldQueue
             } catch (Exception $e) {
                 echo "An error occurred: " . $e->getMessage();
             }
+
+        sleep(7);
         
     }
 
