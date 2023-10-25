@@ -13,7 +13,9 @@
         "laravel/horizon": "^5.18",
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
-        "predis/predis": "^2.2"
+        "maatwebsite/excel": "^3.1",
+        "predis/predis": "^2.2",
+        "psr/simple-cache": "^1.0"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
