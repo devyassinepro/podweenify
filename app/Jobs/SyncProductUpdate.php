@@ -63,6 +63,7 @@ class SyncProductUpdate implements ShouldQueue
                 updatedatabase($store['url'],$i);
             }
     }
+    
 
     }
 }
@@ -121,4 +122,7 @@ function updatedatabase($store , $i){
 
             }
     });//shoudl be updated now //ok wait
+
+    sleep(5);
+
 }
