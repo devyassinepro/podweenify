@@ -21,6 +21,7 @@ class Product extends Model
     protected $fillable = [
         'id',
         'title',
+        'description',
         'timesparam',
         'prix',
         'revenue',
@@ -39,6 +40,14 @@ class Product extends Model
         'day7sales',
         'weeksales',
         'monthsales',
+        'created_at_shopify',
+        'created_at_favorite',
+        'price_aliexpress',
+        'image2',
+        'image3',
+        'image4',
+        'image5',
+        'image6',
 
     ];
 

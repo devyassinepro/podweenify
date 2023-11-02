@@ -17,6 +17,7 @@ class CreateProductsTable extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('title',500);
+            $table->text('description');
             $table->string('timesparam',500);
             $table->float('prix');
             $table->float('revenue');
@@ -35,6 +36,14 @@ class CreateProductsTable extends Migration
             $table->integer('day7sales');
             $table->integer('weeksales');
             $table->integer('monthsales');
+            $table->date('created_at_shopify')->nullable();
+            $table->date('created_at_favorite')->nullable();
+            $table->float('price_aliexpress');
+            $table->string('image2',500);
+            $table->string('image3',500);
+            $table->string('image4',500);
+            $table->string('image5',500);
+            $table->string('image6',500);
             $table->timestamps();
         });
     }

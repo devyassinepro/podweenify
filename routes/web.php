@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DataController;
 use App\Http\Controllers\TestController;
 use App\Jobs\ProcessApiStoreJob;
+use App\Jobs\ProcessProductUpdate;
 use App\Jobs\ProcessCountproductsRevenue;
 use App\Jobs\ProcessCountStoresRevenue;
 use App\Jobs\Process24storesRevenue;
@@ -103,6 +104,16 @@ Route::get('/start',function (){
       echo $stores; echo '<br />';
 });
 
+// Update product database after existing in database 
+Route::get('/updateproducts',function (){
+
+    $stores = Stores::all();
+
+    ProcessProductUpdate::dispatch($stores);
+
+     echo $stores; echo '<br />';
+});
+
 // Start Queue every 2 Hours Calculate Revenue Stores
 Route::get('/countstores',function (){
     $stores = Stores::select("*")
@@ -131,6 +142,36 @@ Route::get('/countProducts',function (){
         ProcessCountproductsRevenue::dispatch($products);
       echo $products; echo '<br />';
 });
+
+
+// Start Queue every 4 Hours Count Products Revenue
+Route::get('/deletestore',function (){
+   
+
+    // DB::table('products')->where('stores_id', 11800)->delete();
+
+    DB::beginTransaction();
+
+    try {
+        // Delete products where id_store is equal to 20
+        Product::where('stores_id', 11800)->delete();
+
+        // Commit the transaction
+        DB::commit();
+    } catch (Exception $e) {
+        // Handle any exceptions and rollback the transaction if needed
+        DB::rollback();
+    }
+
+    // Stores::where('id', 11808)->delete();
+   
+    // Product::where('stores_id', 11808)->delete();
+
+      echo "Done"; echo '<br />';
+});
+
+
+
 
 
 Route::get('/product',function (){
