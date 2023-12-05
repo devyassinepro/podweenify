@@ -80,8 +80,8 @@ function updatedatabase($store,$store_id , $i){
   
     // echo $responsecode;
     $products = json_decode($html)->products;
-    collect($products)->map(function ($product) {
-
+    // collect($products)->map(function ($product) {
+       collect($products)->map(function ($product) use ($urlstore) {
         $urlproduct = $urlstore.'products/'.$product->handle;
 
 
