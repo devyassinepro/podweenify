@@ -74,10 +74,16 @@ function updatedatabase($store,$store_id , $i){
     $opts = array('http'=>array('header' => "User-Agent:MyAgent/1.0\r\n"));
     $context = stream_context_create($opts);
     $html = file_get_contents($store.'products.json?page='.$i.'&limit=250',false,$context);
+
+    $urlstore = $store;
+
   
     // echo $responsecode;
     $products = json_decode($html)->products;
     collect($products)->map(function ($product) {
+
+        $urlproduct = $urlstore.'products/'.$product->handle;
+
 
         $productbd = DB::table('products')->where('id', $product->id)->first();
         if($productbd) {
@@ -153,8 +159,6 @@ function updatedatabase($store,$store_id , $i){
 
             $timeconvert = strtotime($product->updated_at);
             $totalsales = 0;
-            $urlproduct = $store.'products/'.$product->handle;
-
             Product::firstOrCreate([
                 "id" => $product->id,
                 "title" => $product->title,
