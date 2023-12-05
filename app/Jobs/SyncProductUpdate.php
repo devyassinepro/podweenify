@@ -81,8 +81,9 @@ function updatedatabase($store,$store_id , $i){
     // echo $responsecode;
     $products = json_decode($html)->products;
     // collect($products)->map(function ($product) {
-       collect($products)->map(function ($product) use ($urlstore) {
-        $urlproduct = $urlstore.'products/'.$product->handle;
+        collect($products)->map(function ($product) use ($urlstore,$store_id) {
+            
+            $urlproduct = $urlstore.'products/'.$product->handle;
 
 
         $productbd = DB::table('products')->where('id', $product->id)->first();
