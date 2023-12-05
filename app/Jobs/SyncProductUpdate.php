@@ -90,6 +90,16 @@ function updatedatabase($store,$store_id , $i){
         if($productbd) {
 
                     // Check if the images array has elements before accessing them
+                    if(isset($product->variants[0]->price)){
+                        $price= $product->variants[0]->price;
+                    }else{
+                        $price=0;
+                    }
+                    if(isset($product->images[0]->src)){
+                        $image= $product->images[0]->src;
+                    }else{
+                        $image ='';
+                    }
                     if (isset($product->images[1])) {
                         $image2 = $product->images[1]->src;
                     }else $image2 ='';
@@ -114,8 +124,8 @@ function updatedatabase($store,$store_id , $i){
                 // title ,prix, url ,imageproduct, description , created_at_shopify , image2 , image3 , image4 , image5 , image6
                 $productreq = array(
                     'title' => $product->title,
-                    'prix' => $product->variants[0]->price,
-                    'imageproduct' => $product->images[0]->src,
+                    'prix' => $price,
+                    'imageproduct' => $image,
                     'description' => $product->body_html,
                     'created_at_shopify' => $product->published_at,
                     'image2' => $image2,
