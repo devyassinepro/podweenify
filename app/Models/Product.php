@@ -48,6 +48,8 @@ class Product extends Model
         'image4',
         'image5',
         'image6',
+        'dropshipping',
+
 
     ];
 
