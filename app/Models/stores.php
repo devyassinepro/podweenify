@@ -42,6 +42,8 @@ class stores extends Model
         'day7sales',
         'weeksales',
         'monthsales',
+        'dropshipping',
+
     ];
     public function niches(){
         return $this->belongsToMany(Niche::class);
