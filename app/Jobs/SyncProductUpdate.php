@@ -44,23 +44,23 @@ class SyncProductUpdate implements ShouldQueue
         $store = $this->store;
         if($store['allproducts']<=250 ){
 
-            updatedatabase($store['url'],$store['id'],1);
+            updatedatabase($store['url'],$store['id'],1,$store['dropshipping']);
 
     }else if($store['allproducts']<=500){
 
         for ($i = 1; $i <= 2; $i++) {
-            updatedatabase($store['url'],$store['id'],$i);
+            updatedatabase($store['url'],$store['id'],$i,$store['dropshipping']);
 
         }
 
     }else if($store['allproducts']<=750){
         for ($i = 1; $i <= 3; $i++) {
-            updatedatabase($store['url'],$store['id'],$i);
+            updatedatabase($store['url'],$store['id'],$i,$store['dropshipping']);
 
         }
     }else if($store['allproducts']<=1000){
             for ($i = 1; $i <= 4; $i++) {
-                updatedatabase($store['url'],$store['id'],$i);
+                updatedatabase($store['url'],$store['id'],$i,$store['dropshipping']);
             }
     }
     
@@ -70,7 +70,7 @@ class SyncProductUpdate implements ShouldQueue
 
 //check if we have new products in the store 
 
-function updatedatabase($store,$store_id , $i){
+function updatedatabase($store,$store_id , $i , $dropshipping){
     $opts = array('http'=>array('header' => "User-Agent:MyAgent/1.0\r\n"));
     $context = stream_context_create($opts);
     $html = file_get_contents($store.'products.json?page='.$i.'&limit=250',false,$context);
@@ -190,8 +190,11 @@ function updatedatabase($store,$store_id , $i){
                 "day7sales" => 0,
                 "weeksales" => 0,
                 "monthsales" => 0,
+                'dropshipping' => $dropshipping,
+                'price_aliexpress'=>0,
                 'description' => $product->body_html,
                 'created_at_shopify' => $product->published_at,
+                'created_at_favorite' => $product->published_at,
                 'image2' => $image2,
                 'image3' => $image3,
                 'image4' => $image4,
@@ -202,6 +205,6 @@ function updatedatabase($store,$store_id , $i){
         }
     });//shoudl be updated now //ok wait
 
-    sleep(5);
+    sleep(3);
 
 }
