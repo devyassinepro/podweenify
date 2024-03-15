@@ -73,12 +73,23 @@ class SyncProductResearch implements ShouldQueue
                             'name' => $metas->name,
                             'status' => 0,
                             'sales' => 0,
+                            'tag' => '',
                             'revenue' => 0,
                             'city' => $metas->city,
                             'country' => $metas->country,
                             'currency' => $metas->currency,
                             'shopifydomain' => $metas->myshopify_domain,
                             'allproducts' => $metas->published_products_count,
+                            'todaysales' => 0,
+                            'yesterdaysales' => 0,
+                            'day3sales' => 0,
+                            'day4sales' => 0,
+                            'day5sales' => 0,
+                            'day6sales' => 0,
+                            'day7sales' => 0,
+                            'weeksales' => 0,
+                            'monthsales' => 0,
+                            'dropshipping' => 0,
                             'created_at' => now(),
                             'updated_at' => now(),
                             'user_id' => 0
@@ -139,8 +150,27 @@ class SyncProductResearch implements ShouldQueue
                         if(isset($product->images[0]->src)){
                             $image= $product->images[0]->src;
                         }else{
-                            $image="default";
+                            $image ='';
                         }
+                        if (isset($product->images[1])) {
+                            $image2 = $product->images[1]->src;
+                        }else $image2 ='';
+                
+                        if (isset($product->images[2])) {
+                            $image3 = $product->images[2]->src;
+                        }else $image3 ='';
+                
+                        if (isset($product->images[3])) {
+                            $image4 = $product->images[3]->src;
+                        }else $image4 ='';
+                
+                        if (isset($product->images[4])) {
+                            $image5 = $product->images[4]->src;
+                        }else $image5 ='';
+                
+                        if (isset($product->images[5])) {
+                            $image6 = $product->images[5]->src;
+                        }else $image6 ='';
 
                         $timeconvert = strtotime($product->updated_at);
                         $totalsales = 0;
@@ -164,7 +194,17 @@ class SyncProductResearch implements ShouldQueue
                             "day6sales" => 0,
                             "day7sales" => 0,
                             "weeksales" => 0,
-                            "monthsales" => 0
+                            "monthsales" => 0,
+                            'dropshipping' => 1,
+                            'price_aliexpress'=>0,
+                            'description' => $product->body_html,
+                            'created_at_shopify' => $product->published_at,
+                            'created_at_favorite' => $product->published_at,
+                            'image2' => $image2,
+                            'image3' => $image3,
+                            'image4' => $image4,
+                            'image5' => $image5,
+                            'image6' => $image6,
                         ]);
             }
 
