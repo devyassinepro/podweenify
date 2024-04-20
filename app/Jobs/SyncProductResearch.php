@@ -49,27 +49,16 @@ class SyncProductResearch implements ShouldQueue
         $storetype = $this->storetype;
 
         //Dropshipping
-        if($storetype = 1){
+
+        $dropshipping = 0;
+        $digital = 0;
+        $tshirt = 0;
+        if ($storetype == 1) {
             $dropshipping = 1;
-            $digital= 0 ;
-            $tshirt= 0 ;
-        }
-        //General
-        if($storetype = 2){
-            $dropshipping = 0;
-            $digital= 0 ;
-            $tshirt= 0 ;
-        }
-        //trshirt
-        if($storetype = 3){
-            $dropshipping = 0;
-            $digital= 0 ;
-            $tshirt= 1 ;
-        }else{
-            //Digital
-            $dropshipping = 0;
-            $digital= 1 ;
-            $tshirt= 0 ;
+        } elseif ($storetype == 3) {
+            $tshirt = 1;
+        } else {
+            $digital = 1;
         }
         // Use try-catch for error handling
         try {

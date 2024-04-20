@@ -46,7 +46,7 @@ class ProcessProductResearch implements ShouldQueue
             try {
                 $modifiedUrl = "https://$store/";
 
-                SyncProductResearch::dispatch($modifiedUrl,$storetype)->onQueue('daycounter');
+                SyncProductResearch::dispatch($modifiedUrl,$this->storetype)->onQueue('daycounter');
             } catch(\Exception $exception) {
 
                 Log::error($exception->getMessage());
