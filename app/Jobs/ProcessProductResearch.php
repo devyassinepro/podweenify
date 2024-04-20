@@ -44,7 +44,13 @@ class ProcessProductResearch implements ShouldQueue
         foreach($this->stores as $store){
 
             try {
-                $modifiedUrl = "https://$store/";
+                // $modifiedUrl = "https://$store/";
+                     // Check if the URL starts with "https://"
+                if (strpos($store, 'https://') !== 0) {
+                    $modifiedUrl = "https://$store/";
+                } else {
+                    $modifiedUrl = $store;
+                }
 
                 SyncProductResearch::dispatch($modifiedUrl,$this->storetype)->onQueue('daycounter');
             } catch(\Exception $exception) {
