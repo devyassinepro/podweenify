@@ -49,6 +49,8 @@ class Product extends Model
         'image5',
         'image6',
         'dropshipping',
+        'tshirt',
+        'digital',
 
 
     ];

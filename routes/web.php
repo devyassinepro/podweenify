@@ -56,6 +56,7 @@ Route::post('/uploadcsv', function () {
 
     if (request()->hasFile('mycsv')) {
         $csvFile = request()->file('mycsv');
+        $category = request()->input('category');
     
         if ($csvFile->isValid() && $csvFile->isReadable()) {
             $data = array_map('str_getcsv', file($csvFile));
@@ -75,7 +76,8 @@ Route::post('/uploadcsv', function () {
                 }
     
                 // Dispatch the job with the entire array of URLs
-                ProcessProductResearch::dispatch($urls);
+
+             ProcessProductResearch::dispatch($urls,$category);
 
                 echo 'Job dispatched for processing all URLs.';
             } else {
@@ -114,7 +116,17 @@ Route::get('/updateproducts',function (){
      echo $stores; echo '<br />';
 });
 
-// Start Queue every 2 Hours Calculate Revenue Stores
+// Start Queue every 24 Hours stores and products //  Sync24storesRevenue
+Route::get('/countstoresdaily',function (){
+    $stores = Stores::select("*")
+            ->where('status','1')
+            ->get();
+
+    Process24storesRevenue::dispatch($stores);
+  echo $stores; echo '<br />';
+});
+
+// Start Queue every 2 Hours Calculate Revenue Stores // SyncCountStoresRevenue
 Route::get('/countstores',function (){
     $stores = Stores::select("*")
         ->where('status','1')
@@ -124,17 +136,7 @@ Route::get('/countstores',function (){
       echo $stores; echo '<br />';
 });
 
-// Start Queue every 24 Hours stores and products
-Route::get('/countstoresdaily',function (){
-        $stores = Stores::select("*")
-                ->where('status','1')
-                ->get();
-
-        Process24storesRevenue::dispatch($stores);
-      echo $stores; echo '<br />';
-});
-
-// Start Queue every 4 Hours Count Products Revenue
+// Start Queue every 4 Hours Count Products Revenue //SyncCountProductsRevenue
 Route::get('/countProducts',function (){
     $products = Product::select("*")
         ->whereDate('updated_at', '=', Carbon::today()->format('Y-m-d'))

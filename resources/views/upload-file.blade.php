@@ -16,10 +16,14 @@
                 @csrf
                 <input type="file" name="mycsv" class="form-control">
                 <br>
+                <select name="category" id="category" class="form-control">
+                    <option value="1">Dropshipping</option>
+                    <option value="2">General</option>
+                    <option value="3">T-shirt</option>
+                    <option value="4">Digital</option>
+                </select>
                 <button class="btn btn-primary">Import Stores Data</button>
             </form>
-
-  
         </div>
     </div>
 </div>

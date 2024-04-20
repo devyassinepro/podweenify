@@ -43,6 +43,8 @@ class stores extends Model
         'weeksales',
         'monthsales',
         'dropshipping',
+        'tshirt',
+        'digital',
 
     ];
     public function niches(){

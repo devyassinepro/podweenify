@@ -28,6 +28,8 @@ class CreateProductsTable extends Migration
             $table->integer('totalsales');
             $table->integer('favoris');
             $table->integer('dropshipping');
+            $table->integer('tshirt');
+            $table->integer('digital');
             $table->integer('todaysales');
             $table->integer('yesterdaysales');
             $table->integer('day3sales');

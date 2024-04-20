@@ -24,6 +24,8 @@ class CreateStoresTable extends Migration
             $table->string('currency');
             $table->string('shopifydomain');
             $table->integer('dropshipping');
+            $table->integer('tshirt');
+            $table->integer('digital');
             $table->integer('sales');
             $table->integer('allproducts');
             $table->integer('user_id');

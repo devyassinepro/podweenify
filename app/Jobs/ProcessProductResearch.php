@@ -18,6 +18,7 @@ class ProcessProductResearch implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $stores;
+    public $storetype;
 
 
     /**
@@ -25,9 +26,10 @@ class ProcessProductResearch implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($stores)
+    public function __construct($stores,$storetype)
     {
         $this->stores = $stores;
+        $this->storetype = $storetype;
     }
 
     /**
@@ -44,7 +46,7 @@ class ProcessProductResearch implements ShouldQueue
             try {
                 $modifiedUrl = "https://$store/";
 
-                SyncProductResearch::dispatch($modifiedUrl)->onQueue('daycounter');
+                SyncProductResearch::dispatch($modifiedUrl,$storetype)->onQueue('daycounter');
             } catch(\Exception $exception) {
 
                 Log::error($exception->getMessage());

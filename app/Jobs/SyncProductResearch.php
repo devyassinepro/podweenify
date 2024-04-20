@@ -23,6 +23,7 @@ class SyncProductResearch implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $store;
+    public $storetype;
 
 
     /**
@@ -30,9 +31,10 @@ class SyncProductResearch implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($store)
+    public function __construct($store,$storetype)
     {
         $this->store = $store;
+        $this->storetype = $storetype;
     }
 
     /**
@@ -42,9 +44,33 @@ class SyncProductResearch implements ShouldQueue
      */
     public function handle()
     {
-        //
-
+    
         $domain = $this->store;
+        $storetype = $this->storetype;
+
+        //Dropshipping
+        if($storetype = 1){
+            $dropshipping = 1;
+            $digital= 0 ;
+            $tshirt= 0 ;
+        }
+        //General
+        if($storetype = 2){
+            $dropshipping = 0;
+            $digital= 0 ;
+            $tshirt= 0 ;
+        }
+        //trshirt
+        if($storetype = 3){
+            $dropshipping = 0;
+            $digital= 0 ;
+            $tshirt= 1 ;
+        }else{
+            //Digital
+            $dropshipping = 0;
+            $digital= 1 ;
+            $tshirt= 0 ;
+        }
         // Use try-catch for error handling
         try {
 
@@ -89,7 +115,9 @@ class SyncProductResearch implements ShouldQueue
                             'day7sales' => 0,
                             'weeksales' => 0,
                             'monthsales' => 0,
-                            'dropshipping' => 0,
+                            'dropshipping' => $dropshipping,
+                            'tshirt' => $tshirt,
+                            'digital' => $digital,
                             'created_at' => now(),
                             'updated_at' => now(),
                             'user_id' => 0
@@ -195,7 +223,9 @@ class SyncProductResearch implements ShouldQueue
                             "day7sales" => 0,
                             "weeksales" => 0,
                             "monthsales" => 0,
-                            'dropshipping' => 1,
+                            'dropshipping' => $dropshipping,
+                            'tshirt' => $tshirt,
+                            'digital' => $digital,
                             'price_aliexpress'=>0,
                             'description' => $product->body_html,
                             'created_at_shopify' => $product->published_at,
