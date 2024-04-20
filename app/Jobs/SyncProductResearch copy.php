@@ -112,29 +112,27 @@ class SyncProductResearch implements ShouldQueue
                             'user_id' => 0
                             ]
                         );
+                        
+                        if($totalproducts<=250){
+                            $this->createstore($domain,$store_id,1,$dropshipping,$digital,$tshirt);
 
-                        if($dropshipping){
-                            $storeIndex = 1;
-                            $productsPerPage = 250;
-                            $totalProductsRemaining = $totalproducts;
-                            
-                            while ($totalProductsRemaining > 0) {
-                                $this->createstore($domain, $store_id, $storeIndex, $dropshipping, $digital, $tshirt);
-                                $storeIndex++;
-                                $totalProductsRemaining -= $productsPerPage;
+
+                        }else if($totalproducts<=500){
+                            for ($i = 1; $i <= 2; $i++) {
+                                $this->createstore($domain,$store_id,$i,$dropshipping,$digital,$tshirt);
+
                             }
-                        }else{
-                            $storeIndex = 1;
-                            $productsPerPage = 250;
-                            $totalProductsRemaining = min($totalproducts, 1000); // Limit to 1000 products
-    
-                            while ($totalProductsRemaining > 0) {
-                                $this->createstore($domain, $store_id, $storeIndex, $dropshipping, $digital, $tshirt);
-                                $storeIndex++;
-                                $totalProductsRemaining -= $productsPerPage;
+                         }else if($totalproducts<=750){
+                            for ($i = 1; $i <= 3; $i++) {
+                                $this->createstore($domain,$store_id,$i,$dropshipping,$digital,$tshirt);
+
                             }
                         }
-                       
+                        else if($totalproducts<=1000 || $totalproducts>1000){
+                            for ($i = 1; $i <= 4; $i++) {
+                                $this->createstore($domain,$store_id,$i,$dropshipping,$digital,$tshirt);
+                            }
+                        }
 
                        
                     } else {
