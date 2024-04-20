@@ -42,27 +42,32 @@ class SyncProductUpdate implements ShouldQueue
         //
 
         $store = $this->store;
-        if($store['allproducts']<=250 ){
 
-            updatedatabase($store['url'],$store['id'],1,$store['dropshipping'],$store['tshirt'],$store['digital']);
+        if($store['dropshipping'] == 1){
 
-    }else if($store['allproducts']<=500){
-
-        for ($i = 1; $i <= 2; $i++) {
-            updatedatabase($store['url'],$store['id'],$i,$store['dropshipping'],$store['tshirt'],$store['digital']);
-
-        }
-
-    }else if($store['allproducts']<=750){
-        for ($i = 1; $i <= 3; $i++) {
-            updatedatabase($store['url'],$store['id'],$i,$store['dropshipping'],$store['tshirt'],$store['digital']);
-
-        }
-    }else if($store['allproducts']<=1000){
-            for ($i = 1; $i <= 4; $i++) {
-                updatedatabase($store['url'],$store['id'],$i,$store['dropshipping'],$store['tshirt'],$store['digital']);
+            $storeIndex = 1;
+            $productsPerPage = 250;
+            $totalProductsRemaining = $store['allproducts'];
+            
+            while ($totalProductsRemaining > 0) {
+                updatedatabase($store['url'],$store['id'],$storeIndex,$store['dropshipping'],$store['tshirt'],$store['digital']);
+                $storeIndex++;
+                $totalProductsRemaining -= $productsPerPage;
             }
-    }
+
+        }else{
+            //only 1000 products if else
+            $storeIndex = 1;
+            $productsPerPage = 250;
+            $totalProductsRemaining = min($totalproducts, 1000); // Limit to 1000 products
+
+            while ($totalProductsRemaining > 0) {
+                updatedatabase($store['url'],$store['id'],$storeIndex,$store['dropshipping'],$store['tshirt'],$store['digital']);
+                $storeIndex++;
+                $totalProductsRemaining -= $productsPerPage;
+            }
+       
+        }
     
 
     }
@@ -70,10 +75,10 @@ class SyncProductUpdate implements ShouldQueue
 
 //check if we have new products in the store 
 
-function updatedatabase($store,$store_id , $i , $dropshipping, $tshirt, $digital){
+function updatedatabase($store,$store_id , $storeIndex , $dropshipping, $tshirt, $digital){
     $opts = array('http'=>array('header' => "User-Agent:MyAgent/1.0\r\n"));
     $context = stream_context_create($opts);
-    $html = file_get_contents($store.'products.json?page='.$i.'&limit=250',false,$context);
+    $html = file_get_contents($store.'products.json?page='.$storeIndex.'&limit=250',false,$context);
 
     $urlstore = $store;
 

@@ -112,7 +112,7 @@ class SyncProductResearch implements ShouldQueue
                             'user_id' => 0
                             ]
                         );
-
+                      //add all products if is dropshipping
                         if($dropshipping){
                             $storeIndex = 1;
                             $productsPerPage = 250;
@@ -124,6 +124,7 @@ class SyncProductResearch implements ShouldQueue
                                 $totalProductsRemaining -= $productsPerPage;
                             }
                         }else{
+                            //only 1000 products if else
                             $storeIndex = 1;
                             $productsPerPage = 250;
                             $totalProductsRemaining = min($totalproducts, 1000); // Limit to 1000 products
