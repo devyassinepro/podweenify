@@ -114,23 +114,23 @@ class SyncProductResearch implements ShouldQueue
                         );
                         
                         if($totalproducts<=250){
-                            $this->createstore($domain,$store_id,1);
+                            $this->createstore($domain,$store_id,1,$dropshipping,$digital,$tshirt);
 
 
                         }else if($totalproducts<=500){
                             for ($i = 1; $i <= 2; $i++) {
-                                $this->createstore($domain,$store_id,$i);
+                                $this->createstore($domain,$store_id,$i,$dropshipping,$digital,$tshirt);
 
                             }
                          }else if($totalproducts<=750){
                             for ($i = 1; $i <= 3; $i++) {
-                                $this->createstore($domain,$store_id,$i);
+                                $this->createstore($domain,$store_id,$i,$dropshipping,$digital,$tshirt);
 
                             }
                         }
                         else if($totalproducts<=1000 || $totalproducts>1000){
                             for ($i = 1; $i <= 4; $i++) {
-                                $this->createstore($domain,$store_id,$i);
+                                $this->createstore($domain,$store_id,$i,$dropshipping,$digital,$tshirt);
                             }
                         }
 
@@ -149,7 +149,7 @@ class SyncProductResearch implements ShouldQueue
     }
 
 
-    public function createstore ($store ,$store_id, $i){
+    public function createstore ($store ,$store_id, $i,$dropshipping,$digital,$tshirt){
 
 
         try {
