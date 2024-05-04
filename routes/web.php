@@ -20,7 +20,7 @@ use Laravel\Horizon\Http\Controllers\HorizonController;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use Illuminate\Support\Facades\Log;
-
+use Symfony\Component\DomCrawler\Crawler;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -40,10 +40,11 @@ set_time_limit(0);
 |
 *///
 
+Route::get('/scrape-store', [TestController::class, 'scrapeStore']);
+
 Route::get('/', function () {
     return view('index');
 });
-
 
 Route::get('/uploadcsv', function () {
 
