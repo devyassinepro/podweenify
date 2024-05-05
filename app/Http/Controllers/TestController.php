@@ -20,22 +20,54 @@ class TestController extends Controller
 
     public function productresearch(){
 
-        $url = "https://www.blanqi.com/";
-        $storedata =$this->scrapeStore($url);
+        $store = "https://angelcurves.com/";
 
-        echo $storedata['site_name'] ;echo '<br />';
-        echo $storedata['description'];echo '<br />';
-        echo implode(', ', $storedata['instagram_usernames']);echo '<br />';
-        echo implode(', ', $storedata['facebook_usernames']);echo '<br />';
-        echo implode(', ', $storedata['tiktok_usernames']);echo '<br />';
-        echo implode(', ', $storedata['pinterest_usernames']);echo '<br />';
-        echo implode(', ', $storedata['youtube_usernames']);echo '<br />';
-        echo $storedata['theme_name'];echo '<br />';
-        echo $storedata['tiktok_pixel'];echo '<br />';
-        echo $storedata['google_ads'];echo '<br />';
-        echo $storedata['facebook_pixel'];echo '<br />';
-        echo $storedata['snapchat_pixel'];echo '<br />';
-        echo $storedata['pinterest_pixel'];echo '<br />';
+        // echo $storedata['site_name'] ;echo '<br />';
+        // echo $storedata['description'];echo '<br />';
+        // echo implode(', ', $storedata['instagram_usernames']);echo '<br />';
+        // echo implode(', ', $storedata['facebook_usernames']);echo '<br />';
+        // echo implode(', ', $storedata['tiktok_usernames']);echo '<br />';
+        // echo implode(', ', $storedata['pinterest_usernames']);echo '<br />';
+        // echo implode(', ', $storedata['youtube_usernames']);echo '<br />';
+        // echo $storedata['theme_name'];echo '<br />';
+        // echo $storedata['tiktok_pixel'];echo '<br />';
+        // echo $storedata['google_ads'];echo '<br />';
+        // echo $storedata['facebook_pixel'];echo '<br />';
+        // echo $storedata['snapchat_pixel'];echo '<br />';
+        // echo $storedata['pinterest_pixel'];echo '<br />';
+
+
+        $storedata =$this->scrapeStore($store);
+        
+        // Use try-catch for error handling
+        try {
+           $stores =  DB::table('stores')->where('url', $store)->first();
+           // DB::table('products')
+           if($stores){
+                       $Updatescrappingstores = array(
+                           'title'=> $storedata['site_name'],
+                           'description'=> $storedata['description'],
+                           'theme'=> $storedata['theme_name'],
+                           'facebookusername'=> implode(', ', $storedata['facebook_usernames']),
+                           'instagramusername'=> implode(', ', $storedata['instagram_usernames']),
+                           'pinterestusername'=> implode(', ', $storedata['pinterest_usernames']),
+                           'youtubeusername'=> implode(', ', $storedata['youtube_usernames']),
+                           'tiktokusername'=> implode(', ', $storedata['tiktok_usernames']),
+                           'snapchatusername'=> implode(', ', $storedata['snapchat_usernames']),
+                           'facebookpixel'=> $storedata['facebook_pixel'],
+                           'googlepixel'=> $storedata['google_ads'],
+                           'snapchatpixel'=> $storedata['snapchat_pixel'],
+                           'pinterestpixel'=> $storedata['pinterest_pixel'],
+                           'tiktokpixel'=> $storedata['tiktok_pixel'],
+                       );
+
+                   DB::table('stores')->where('url', $store)->update($Updatescrappingstores);
+                   
+               } 
+           
+           } catch (Exception $e) {
+               echo "An error occurred: " . $e->getMessage();
+           }
 
 
     }
