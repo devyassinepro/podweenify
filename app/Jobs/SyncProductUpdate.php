@@ -12,8 +12,9 @@ use App\Models\stores;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Product;
-use Symfony\Component\DomCrawler\Crawler;
 use GuzzleHttp\Client;
+use Symfony\Component\DomCrawler\Crawler;
+
 
 
 class SyncProductUpdate implements ShouldQueue
