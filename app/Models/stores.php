@@ -45,6 +45,20 @@ class stores extends Model
         'dropshipping',
         'tshirt',
         'digital',
+        'title',
+        'description',
+        'theme',
+        'facebookusername',
+        'pinterestusername',
+        'youtubeusername',
+        'instagramusername',
+        'snapchatusername',
+        'tiktokusername',
+        'facebookpixel',
+        'googlepixel',
+        'snapchatpixel',
+        'pinterestpixel',
+        'tiktokpixel',
 
     ];
     public function niches(){

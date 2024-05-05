@@ -38,6 +38,20 @@ class CreateStoresTable extends Migration
             $table->integer('day7sales');
             $table->integer('weeksales');
             $table->integer('monthsales');
+            $table->string('title');
+            $table->string('description');
+            $table->string('theme');
+            $table->string('facebookusername');
+            $table->string('pinterestusername');
+            $table->string('instagramusername');
+            $table->string('youtubeusername');
+            $table->string('tiktokusername');
+            $table->string('snapchatusername');
+            $table->integer('facebookpixel');
+            $table->integer('googlepixel');
+            $table->integer('snapchatpixel');
+            $table->integer('pinterestpixel');
+            $table->integer('tiktokpixel');
             $table->timestamps();
         });
     }

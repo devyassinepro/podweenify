@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Log;
 use GuzzleHttp\Client;
 use App\Models\stores;
 use App\Models\Product;
+use Symfony\Component\DomCrawler\Crawler;
 
 set_time_limit(0);
 
@@ -48,6 +49,10 @@ class SyncProductResearch implements ShouldQueue
         $domain = $this->store;
         $storetype = $this->storetype;
 
+
+        // Scrapping DATA 
+        $storedata =$this->scrapeStore($domain);
+
         //Dropshipping
 
         $dropshipping = 0;
@@ -60,6 +65,7 @@ class SyncProductResearch implements ShouldQueue
         } else {
             $digital = 1;
         }
+
         // Use try-catch for error handling
         try {
 
@@ -107,6 +113,20 @@ class SyncProductResearch implements ShouldQueue
                             'dropshipping' => $dropshipping,
                             'tshirt' => $tshirt,
                             'digital' => $digital,
+                            'title'=> $storedata['site_name'],
+                            'description'=> $storedata['description'],
+                            'theme'=> $storedata['theme_name'],
+                            'facebookusername'=> implode(', ', $storedata['facebook_usernames']),
+                            'instagramusername'=> implode(', ', $storedata['instagram_usernames']),
+                            'pinterestusername'=> implode(', ', $storedata['pinterest_usernames']),
+                            'youtubeusername'=> implode(', ', $storedata['youtube_usernames']),
+                            'tiktokusername'=> implode(', ', $storedata['tiktok_usernames']),
+                            'snapchatusername'=> implode(', ', $storedata['snapchat_usernames']),
+                            'facebookpixel'=> $storedata['facebook_pixel'],
+                            'googlepixel'=> $storedata['google_ads'],
+                            'snapchatpixel'=> $storedata['snapchat_pixel'],
+                            'pinterestpixel'=> $storedata['pinterest_pixel'],
+                            'tiktokpixel'=> $storedata['tiktok_pixel'],
                             'created_at' => now(),
                             'updated_at' => now(),
                             'user_id' => 0
@@ -234,6 +254,180 @@ class SyncProductResearch implements ShouldQueue
         } catch (Exception $e) {
                     echo "An error occurred: " . $e->getMessage();
         }    
+    }
+
+
+
+    public function scrapeStore($url)
+    {
+
+        // Fetch HTML content from the URL
+        try {
+            $client = new Client();
+            $response = $client->get($url);
+            $html_content = $response->getBody()->getContents();
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            \Log::error('Failed to fetch URL: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch URL'], 500);
+        }
+        
+        // Extract description, keywords, site name, and social media usernames
+        $description = null;
+        $keywords = null;
+        $site_name = null;
+        $instagram_usernames = [];
+        $facebook_usernames = [];
+        $tiktok_usernames = [];
+        
+        if (!empty($html_content)) {
+            $crawler = new Crawler($html_content);
+            
+            // Extract description meta tag content
+            $description_tag = $crawler->filterXPath('//meta[@name="description"]');
+            if ($description_tag->count() > 0) {
+                $description = $description_tag->attr('content');
+            }
+            
+            
+            // Extract site name from title tag
+            $title_tag = $crawler->filter('title');
+            if ($title_tag->count() > 0) {
+                $site_name = $title_tag->text();
+            }
+            
+            // Extract social media usernames
+            $instagram_usernames = $this->extractSocialMediaUsernames($html_content, 'instagram');
+            $facebook_usernames = $this->extractSocialMediaUsernames($html_content, 'facebook');
+            $tiktok_usernames = $this->extractSocialMediaUsernames($html_content, 'tiktok');
+            $pinterest_usernames = $this->extractSocialMediaUsernames($html_content, 'pinterest');
+            $youtube_usernames = $this->extractSocialMediaUsernames($html_content, 'youtube');
+            $snapchat_usernames = $this->extractSocialMediaUsernames($html_content, 'snapchat');
+
+        }
+        
+        // Check for TikTok pixel
+        $tiktok_pixel = $this->checkTikTokPixel($html_content);
+        
+        // Check for Google Ads
+        $google_ads = $this->checkGoogleAds($html_content);
+        
+        // Check for Facebook Pixel
+        $facebook_pixel = $this->checkFacebookPixel($html_content);
+        
+        return [
+            'site_name' => $site_name,
+            'description' => $description,
+            'instagram_usernames' => $instagram_usernames,
+            'facebook_usernames' => $facebook_usernames,
+            'tiktok_usernames' => $tiktok_usernames,
+            'snapchat_usernames' => $snapchat_usernames,
+            'pinterest_usernames' => $pinterest_usernames,
+            'youtube_usernames' => $youtube_usernames,
+            'theme_name' => $this->extractThemeName($html_content),
+            'tiktok_pixel' => $tiktok_pixel,
+            'google_ads' => $google_ads,
+            'facebook_pixel' => $facebook_pixel,
+            'snapchat_pixel' => $this->checkSnapchatPixel($html_content),
+            'pinterest_pixel' => $this->checkPinterestPixel($html_content),
+        ];
+
+    }
+
+    private function extractSocialMediaUsernames($html_content, $platform)
+    {
+        $usernames = [];
+        if (!empty($html_content)) {
+            // Extract usernames based on the platform
+            switch ($platform) {
+                case 'instagram':
+                    preg_match_all('/(?:https?:\/\/)?(?:www\.)?instagram\.com\/([^\s\/]+)/i', $html_content, $matches);
+                    $usernames = $matches[1];
+                    break;
+                case 'facebook':
+                    preg_match_all('/(?:https?:\/\/)?(?:www\.)?facebook\.com\/([^\s\/]+)/i', $html_content, $matches);
+                    $usernames = $matches[1];
+                    break;
+                case 'tiktok':
+                    preg_match_all('/(?:https?:\/\/)?(?:www\.)?tiktok\.com\/(@[^\s\/]+)/i', $html_content, $matches);
+                    $usernames = $matches[1];
+                    break;
+                case 'snapchat':
+                    preg_match_all('/(?:https?:\/\/)?(?:www\.)?snapchat\.com\/(@[^\s\/]+)/i', $html_content, $matches);
+                    $usernames = $matches[1];
+                    break;
+                case 'pinterest':
+                    preg_match_all('/(?:https?:\/\/)?(?:www\.)?pinterest\.com\/(@[^\s\/]+)/i', $html_content, $matches);
+                    $usernames = $matches[1];
+                    break;
+                case 'youtube':
+                    preg_match_all('/(?:https?:\/\/)?(?:www\.)?youtube\.com\/(@[^\s\/]+)/i', $html_content, $matches);
+                    $usernames = $matches[1];
+                    break;
+            }
+        }
+        return $usernames;
+    }
+
+    private function checkTikTokPixel($html_content)
+    {
+        if (!empty($html_content)) {
+            return stripos($html_content, 'tiktok') !== false ? 1 : 0;
+        }
+        return 0;
+    }
+    
+    private function checkGoogleAds($html_content)
+    {
+        if (!empty($html_content)) {
+            // Look for specific patterns indicating Google Tag Manager
+            // Check for URLs containing "googletagmanager.com"
+            $pattern = '/googletagmanager\.com/i';
+            return preg_match($pattern, $html_content) ? 1 : 0;
+        }
+        return 0;
+    }
+    
+    private function checkFacebookPixel($html_content)
+    {
+        if (!empty($html_content)) {
+            return (stripos($html_content, 'facebook') !== false && stripos($html_content, 'pixel') !== false) ? 1 : 0;
+        }
+        return 0;
+    }
+    
+    private function extractThemeName($html_content)
+    {
+        $theme_name = null;
+        if (!empty($html_content)) {
+            // Use regular expressions to extract the theme name from the script tag
+            $pattern = '/Shopify\.theme\s*=\s*{"name":"([^"]+)"/i';
+            if (preg_match($pattern, $html_content, $matches)) {
+                // The theme name will be captured in the first captured group ($matches[1])
+                $theme_name = $matches[1];
+            }
+        }
+        return $theme_name ? 1 : 0;
+    }
+    
+    private function checkSnapchatPixel($html_content)
+    {
+        if (!empty($html_content)) {
+            // Look for specific patterns indicating Snap Pixel code
+            $pattern = '/<!-- Snap Pixel Code -->.*?snaptr\(\'init\'.*?\'PAGE_VIEW\'\);\s*<\/script>/is';
+            return preg_match($pattern, $html_content) ? 1 : 0;
+        }
+        return 0;
+    }
+    
+    private function checkPinterestPixel($html_content)
+    {
+        if (!empty($html_content)) {
+            // Look for the occurrence of the pintrk function
+            $pattern = '/pintrk\s*\(/i';
+            return preg_match($pattern, $html_content) ? 1 : 0;
+        }
+        return 0;
     }
 
 

@@ -18,11 +18,32 @@ class TestController extends Controller
 {
     //
 
+    public function productresearch(){
 
-    public function scrapeStore()
+        $url = "https://www.blanqi.com/";
+        $storedata =$this->scrapeStore($url);
+
+        echo $storedata['site_name'] ;echo '<br />';
+        echo $storedata['description'];echo '<br />';
+        echo implode(', ', $storedata['instagram_usernames']);echo '<br />';
+        echo implode(', ', $storedata['facebook_usernames']);echo '<br />';
+        echo implode(', ', $storedata['tiktok_usernames']);echo '<br />';
+        echo implode(', ', $storedata['pinterest_usernames']);echo '<br />';
+        echo implode(', ', $storedata['youtube_usernames']);echo '<br />';
+        echo $storedata['theme_name'];echo '<br />';
+        echo $storedata['tiktok_pixel'];echo '<br />';
+        echo $storedata['google_ads'];echo '<br />';
+        echo $storedata['facebook_pixel'];echo '<br />';
+        echo $storedata['snapchat_pixel'];echo '<br />';
+        echo $storedata['pinterest_pixel'];echo '<br />';
+
+
+    }
+
+    public function scrapeStore($url)
     {
-         $url = "https://aquaticarts.com/";
-        // $url = "https://styleombre.com/";
+          $url = "https://aquaticarts.com/";
+        // $url = "https://lespetitsimprimes.com/";
 
 
         // Fetch HTML content from the URL
@@ -53,11 +74,6 @@ class TestController extends Controller
                 $description = $description_tag->attr('content');
             }
             
-            // Extract keywords meta tag content
-            $keywords_tag = $crawler->filterXPath('//meta[@name="keywords"]');
-            if ($keywords_tag->count() > 0) {
-                $keywords = $keywords_tag->attr('content');
-            }
             
             // Extract site name from title tag
             $title_tag = $crawler->filter('title');
@@ -69,6 +85,11 @@ class TestController extends Controller
             $instagram_usernames = $this->extractSocialMediaUsernames($html_content, 'instagram');
             $facebook_usernames = $this->extractSocialMediaUsernames($html_content, 'facebook');
             $tiktok_usernames = $this->extractSocialMediaUsernames($html_content, 'tiktok');
+            $pinterest_usernames = $this->extractSocialMediaUsernames($html_content, 'pinterest');
+            $youtube_usernames = $this->extractSocialMediaUsernames($html_content, 'youtube');
+            $snapchat_usernames = $this->extractSocialMediaUsernames($html_content, 'snapchat');
+
+
         }
         
         // Check for TikTok pixel
@@ -80,138 +101,35 @@ class TestController extends Controller
         // Check for Facebook Pixel
         $facebook_pixel = $this->checkFacebookPixel($html_content);
         
-        return response()->json([
+        // return response()->json([
+        //     'site_name' => $site_name,
+        //     'description' => $description,
+        //     'keywords' => $keywords,
+        //     'instagram_usernames' => $instagram_usernames,
+        //     'facebook_usernames' => $facebook_usernames,
+        //     'tiktok_usernames' => $tiktok_usernames,
+        //     'tiktok_pixel' => $tiktok_pixel,
+        //     'google_ads' => $google_ads,
+        //     'facebook_pixel' => $facebook_pixel
+        // ]);
+
+        return [
             'site_name' => $site_name,
             'description' => $description,
-            'keywords' => $keywords,
             'instagram_usernames' => $instagram_usernames,
             'facebook_usernames' => $facebook_usernames,
             'tiktok_usernames' => $tiktok_usernames,
+            'snapchat_usernames' => $snapchat_usernames,
+            'pinterest_usernames' => $pinterest_usernames,
+            'youtube_usernames' => $youtube_usernames,
+            'theme_name' => $this->extractThemeName($html_content),
             'tiktok_pixel' => $tiktok_pixel,
             'google_ads' => $google_ads,
-            'facebook_pixel' => $facebook_pixel
-        ]);
-    }
+            'facebook_pixel' => $facebook_pixel,
+            'snapchat_pixel' => $this->checkSnapchatPixel($html_content),
+            'pinterest_pixel' => $this->checkPinterestPixel($html_content),
+        ];
 
-    public function index()
-    {
-        //
-        $products = Product::select("*")
-        ->whereDate('updated_at', '=', Carbon::today()->format('Y-m-d'))
-        ->where('id',8168403730725)
-        ->get();
-        echo $products; echo '<br />';
-
-        foreach($products as $product){
-
-            try {
-                echo $product; echo '<br />';
-        $countproductrevenue = Product::where('id', $product->id)->withCount(['todaysales', 'yesterdaysales'])->first();
-        $productreqtoday = array(
-                'todaysales' => $countproductrevenue->todaysales_count,
-                'yesterdaysales' => $countproductrevenue->yesterdaysales_count,
-            );
-            DB::table('products')->where('id', $product->id)->update($productreqtoday);
-
-            } catch(\Exception $exception) {
-
-                Log::error($exception->getMessage());
-                //echo "Error:".$exception->getMessage().'<br />';
-            }
-        }
-
-
-
-    }
-
-
-       //   //where timestap == Today
-        //   $productCounter = Product::whereDate('updated_at', '=', Carbon::today());
-        //   // ->withCount(['todaysales'])->get();
-        //   foreach($productCounter as $producttoday){
-        //       $countproducttoday=Sales::where('updated_at', '=', Carbon::today())->where('product_id','=',$producttoday->id)->withCount('product_id');
-        //               $productreqtoday = array(
-        //                       'todaysales' => $countproducttoday->product_count,
-        //                   );
-        //                   DB::table('products')->where('id', $producttoday->id)->update($productreqtoday);
-
-        //                   echo $producttoday->title; echo '<br />';
-        //                   echo $producttoday->todaysales_count; echo '<br />';
-
-        //   //update
-
-        //   $stores = stores::where('status','1')->where('id',546)->withSum('products', 'totalsales')
-        //   ->withSum('products', 'revenue');
-    public function updatesales(){
-
-
-        $store = "https://printpocketgo.com/";
-        $i = 1;
-        $opts = array('http'=>array('header' => "User-Agent:MyAgent/1.0\r\n"));
-        $context = stream_context_create($opts);
-        $html = file_get_contents($store.'products.json?page=1&limit=250',false,$context);
-
-
-        DB::table('apistatuses')->insert([
-            "store" => $store,
-            "status" => $http_response_header[0],
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now()
-        ]);
-
-        // echo $responsecode;
-        $products = json_decode($html)->products;
-        collect($products)->map(function ($product) {
-
-            $productbd = DB::table('products')->where('id', $product->id)->where('timesparam', '!=', strtotime($product->updated_at))->first();
-            if($productbd) {
-
-                //Ajouter La partie calcule Revenue chaque jours de la semaines
-
-
-                $sales = $productbd->totalsales;
-                $revenuenow = $productbd->revenue + $productbd->prix;
-                $sales ++ ;
-                //echo $sales;
-                $timestt = strtotime($product->updated_at);
-
-                $productreq = array(
-                    'title' => $product->title,
-                    'timesparam' => $timestt,
-                    'prix' => $product->variants[0]->price,
-                    'revenue' => $revenuenow,
-                    'stores_id' => $productbd->stores_id,
-                    'imageproduct' => $product->images[0]->src,
-                    'favoris' => $productbd->favoris,
-                    'totalsales' => $sales,
-                    // 'todaysales' => $productCounter->todaysales_count,
-                    // 'yesterdaysales' => $productCounter->yesterdaysales_count,
-                    // 'day3sales' => 10,
-                    // 'day4sales' => 10,
-                    // 'day5sales' => 10,
-                    // 'day6sales' => 10,
-                    // 'day7sales' => 10,
-                    // 'weeksales' => 10,
-                    // 'monthsales' => 10,
-                    'updated_at' => Carbon::now()->format('Y-m-d'),//pour comparer la journée
-                );
-
-                DB::table('products')->where('id', $productbd->id)->update($productreq);
-
-                DB::table('sales')->insert([
-                    "product_id" => $productbd->id,
-                    "stores_id" => $productbd->stores_id,
-                    "prix" => $productbd->prix,
-                    'created_at' => Carbon::now()->format('Y-m-d'),
-                    'updated_at' => Carbon::now()->format('Y-m-d')
-                ]);
-
-                echo $product->title; echo '<br />';
-                }
-        });//shoudl be updated now //ok wait
-
-
-        // return view('index');
     }
 
     private function extractSocialMediaUsernames($html_content, $platform)
@@ -232,6 +150,18 @@ class TestController extends Controller
                     preg_match_all('/(?:https?:\/\/)?(?:www\.)?tiktok\.com\/(@[^\s\/]+)/i', $html_content, $matches);
                     $usernames = $matches[1];
                     break;
+                case 'snapchat':
+                    preg_match_all('/(?:https?:\/\/)?(?:www\.)?snapchat\.com\/(@[^\s\/]+)/i', $html_content, $matches);
+                    $usernames = $matches[1];
+                    break;
+                case 'pinterest':
+                    preg_match_all('/(?:https?:\/\/)?(?:www\.)?pinterest\.com\/(@[^\s\/]+)/i', $html_content, $matches);
+                    $usernames = $matches[1];
+                    break;
+                case 'youtube':
+                    preg_match_all('/(?:https?:\/\/)?(?:www\.)?youtube\.com\/(@[^\s\/]+)/i', $html_content, $matches);
+                    $usernames = $matches[1];
+                    break;
             }
         }
         return $usernames;
@@ -248,7 +178,12 @@ class TestController extends Controller
     private function checkGoogleAds($html_content)
     {
         if (!empty($html_content)) {
-            return stripos($html_content, 'googlesyndication') !== false;
+            // Look for specific patterns indicating Google Tag Manager
+            // Check for URLs containing "googletagmanager.com"
+            $pattern = '/googletagmanager\.com/i';
+            if (preg_match($pattern, $html_content)) {
+                return true;
+            }
         }
         return false;
     }
@@ -260,4 +195,43 @@ class TestController extends Controller
         }
         return false;
     }
+    private function extractThemeName($html_content)
+    {
+        $theme_name = null;
+        if (!empty($html_content)) {
+            // Use regular expressions to extract the theme name from the script tag
+            $pattern = '/Shopify\.theme\s*=\s*{"name":"([^"]+)"/i';
+            if (preg_match($pattern, $html_content, $matches)) {
+                // The theme name will be captured in the first captured group ($matches[1])
+                $theme_name = $matches[1];
+            }
+        }
+        return $theme_name;
+    }
+
+    private function checkSnapchatPixel($html_content)
+    {
+        if (!empty($html_content)) {
+            // Look for specific patterns indicating Snap Pixel code
+            $pattern = '/<!-- Snap Pixel Code -->.*?snaptr\(\'init\'.*?\'PAGE_VIEW\'\);\s*<\/script>/is';
+            if (preg_match($pattern, $html_content)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    private function checkPinterestPixel($html_content)
+    {
+        if (!empty($html_content)) {
+            // Look for the occurrence of the pintrk function
+            $pattern = '/pintrk\s*\(/i';
+            if (preg_match($pattern, $html_content)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

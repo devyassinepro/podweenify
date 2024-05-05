@@ -42,6 +42,9 @@ set_time_limit(0);
 
 Route::get('/scrape-store', [TestController::class, 'scrapeStore']);
 
+Route::get('/productresearch', [TestController::class, 'productresearch']);
+
+
 Route::get('/', function () {
     return view('index');
 });
