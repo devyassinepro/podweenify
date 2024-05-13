@@ -16,6 +16,7 @@ use App\Models\stores;
 use App\Models\Product;
 use Symfony\Component\DomCrawler\Crawler;
 
+
 set_time_limit(0);
 
 
@@ -116,12 +117,12 @@ class SyncProductResearch implements ShouldQueue
                             'title'=> $storedata['site_name'],
                             'description'=> $storedata['description'],
                             'theme'=> $storedata['theme_name'],
-                            'facebookusername'=> implode(', ', $storedata['facebook_usernames']),
-                            'instagramusername'=> implode(', ', $storedata['instagram_usernames']),
-                            'pinterestusername'=> implode(', ', $storedata['pinterest_usernames']),
-                            'youtubeusername'=> implode(', ', $storedata['youtube_usernames']),
-                            'tiktokusername'=> implode(', ', $storedata['tiktok_usernames']),
-                            'snapchatusername'=> implode(', ', $storedata['snapchat_usernames']),
+                            'facebookusername'=> $storedata['facebook_usernames'],
+                            'instagramusername'=> $storedata['instagram_usernames'],
+                            'pinterestusername'=> $storedata['pinterest_usernames'],
+                            'youtubeusername'=> $storedata['youtube_usernames'],
+                            'tiktokusername'=> $storedata['tiktok_usernames'],
+                            'snapchatusername'=> $storedata['snapchat_usernames'],
                             'facebookpixel'=> $storedata['facebook_pixel'],
                             'googlepixel'=> $storedata['google_ads'],
                             'snapchatpixel'=> $storedata['snapchat_pixel'],
@@ -297,12 +298,12 @@ class SyncProductResearch implements ShouldQueue
             }
             
             // Extract social media usernames
-            $instagram_usernames = $this->extractSocialMediaUsernames($html_content, 'instagram');
-            $facebook_usernames = $this->extractSocialMediaUsernames($html_content, 'facebook');
-            $tiktok_usernames = $this->extractSocialMediaUsernames($html_content, 'tiktok');
-            $pinterest_usernames = $this->extractSocialMediaUsernames($html_content, 'pinterest');
-            $youtube_usernames = $this->extractSocialMediaUsernames($html_content, 'youtube');
-            $snapchat_usernames = $this->extractSocialMediaUsernames($html_content, 'snapchat');
+            $instagram_usernames = $this->extractSocialMediaURLs($html_content, 'instagram');
+            $facebook_usernames = $this->extractSocialMediaURLs($html_content, 'facebook');
+            $tiktok_usernames = $this->extractSocialMediaURLs($html_content, 'tiktok');
+            $pinterest_usernames = $this->extractSocialMediaURLs($html_content, 'pinterest');
+            $youtube_usernames = $this->extractSocialMediaURLs($html_content, 'youtube');
+            $snapchat_usernames = $this->extractSocialMediaURLs($html_content, 'snapchat');
 
         }
         
@@ -334,39 +335,41 @@ class SyncProductResearch implements ShouldQueue
 
     }
 
-    private function extractSocialMediaUsernames($html_content, $platform)
+    private function extractSocialMediaURLs($html_content, $platform)
     {
-        $usernames = [];
+        $url = [];
+
         if (!empty($html_content)) {
-            // Extract usernames based on the platform
+            // Extract URLs based on the platform
             switch ($platform) {
                 case 'instagram':
-                    preg_match_all('/(?:https?:\/\/)?(?:www\.)?instagram\.com\/([^\s\/]+)/i', $html_content, $matches);
-                    $usernames = $matches[1];
+                    preg_match_all('/(?:https?:\/\/)?(?:www\.)?instagram\.com\/[^s\/]+/i', $html_content, $matches);
+                    $url = isset($matches[0][0]) ? $matches[0][0] : null;
                     break;
                 case 'facebook':
-                    preg_match_all('/(?:https?:\/\/)?(?:www\.)?facebook\.com\/([^\s\/]+)/i', $html_content, $matches);
-                    $usernames = $matches[1];
+                    preg_match_all('/(?:https?:\/\/)?(?:www\.)?facebook\.com\/[^\s\/]+/i', $html_content, $matches);
+                    $url = isset($matches[0][0]) ? $matches[0][0] : null;
                     break;
                 case 'tiktok':
-                    preg_match_all('/(?:https?:\/\/)?(?:www\.)?tiktok\.com\/(@[^\s\/]+)/i', $html_content, $matches);
-                    $usernames = $matches[1];
+                    preg_match_all('/(?:https?:\/\/)?(?:www\.)?tiktok\.com\/@?[a-zA-Z0-9_.-]+/i', $html_content, $matches);
+                    $url = isset($matches[0][0]) ? $matches[0][0] : null;
                     break;
+                   
                 case 'snapchat':
-                    preg_match_all('/(?:https?:\/\/)?(?:www\.)?snapchat\.com\/(@[^\s\/]+)/i', $html_content, $matches);
-                    $usernames = $matches[1];
+                    preg_match_all('/(?:https?:\/\/)?(?:www\.)?snapchat\.com\/@[^\s\/]+/i', $html_content, $matches);
+                    $url = isset($matches[0][0]) ? $matches[0][0] : null;
                     break;
                 case 'pinterest':
-                    preg_match_all('/(?:https?:\/\/)?(?:www\.)?pinterest\.com\/(@[^\s\/]+)/i', $html_content, $matches);
-                    $usernames = $matches[1];
+                    preg_match_all('/(?:https?:\/\/)?(?:www\.)?pinterest\.com\/[^\s\/]+/i', $html_content, $matches);
+                    $url = isset($matches[0][0]) ? $matches[0][0] : null;
                     break;
                 case 'youtube':
-                    preg_match_all('/(?:https?:\/\/)?(?:www\.)?youtube\.com\/(@[^\s\/]+)/i', $html_content, $matches);
-                    $usernames = $matches[1];
+                    preg_match_all('/(?:https?:\/\/)?(?:www\.)?youtube\.com\/@[^\s\/]+/i', $html_content, $matches);
+                    $url = isset($matches[0][0]) ? $matches[0][0] : null;
                     break;
             }
         }
-        return $usernames;
+        return $url;
     }
 
     private function checkTikTokPixel($html_content)
